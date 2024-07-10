@@ -1,0 +1,5 @@
+﻿CREATE PROCEDURE GetAllOrderItems
+AS
+BEGIN
+	SELECT * FROM OrderItem;
+END

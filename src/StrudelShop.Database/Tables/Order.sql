@@ -1,0 +1,11 @@
+﻿CREATE TABLE [Order]
+(
+	OrderId INT NOT NULL PRIMARY KEY IDENTITY(1,1),
+	CustomerId INT NOT NULL,
+	OrderDate DATETIME NOT NULL,
+	DeliveryDate DATETIME NOT NULL,
+	TotalAmount DECIMAL(10,2) NOT NULL,
+	PaymentStatus NVARCHAR(50) NOT NULL,
+
+	FOREIGN KEY (CustomerId) REFERENCES Customer(CustomerId)
+)

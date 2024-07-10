@@ -1,0 +1,8 @@
+﻿CREATE PROCEDURE GetAllOrders	
+AS
+BEGIN
+	
+	SELECT * FROM [Order];
+
+END
+

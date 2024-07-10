@@ -63,4 +63,35 @@
     <Folder Include="StoredProcedures\Order" />
     <Folder Include="StoredProcedures\OrderItem" />
   </ItemGroup>
+  <ItemGroup>
+    <Build Include="Tables\Customer.sql" />
+    <Build Include="Tables\Product.sql" />
+    <Build Include="Tables\Order.sql" />
+    <Build Include="Tables\OrderItem.sql" />
+    <Build Include="StoredProcedures\Customer\GetAllCustomers.sql" />
+    <Build Include="StoredProcedures\Customer\GetCustomerById.sql" />
+    <Build Include="StoredProcedures\Customer\CreateCustomer.sql" />
+    <Build Include="StoredProcedures\Customer\UpdateCustomer.sql" />
+    <Build Include="StoredProcedures\Customer\DeleteCustomer.sql" />
+    <Build Include="StoredProcedures\Product\GetAllProducts.sql" />
+    <Build Include="StoredProcedures\Product\GetProductById.sql" />
+    <Build Include="StoredProcedures\Product\CreateProduct.sql" />
+    <Build Include="StoredProcedures\Product\UpdateProduct.sql" />
+    <Build Include="StoredProcedures\Product\DeleteProduct.sql" />
+    <Build Include="StoredProcedures\Order\GetAllOrders.sql" />
+    <Build Include="StoredProcedures\Order\GetOrderById.sql" />
+    <Build Include="StoredProcedures\Order\CreateOrder.sql" />
+    <Build Include="StoredProcedures\Order\UpdateOrder.sql" />
+    <Build Include="StoredProcedures\Order\DeleteOrder.sql" />
+    <Build Include="StoredProcedures\Order\GetOrdersByDateRange.sql" />
+    <Build Include="StoredProcedures\Order\GetOrderDetails.sql" />
+    <Build Include="StoredProcedures\OrderItem\GetOrderItemById.sql" />
+    <Build Include="StoredProcedures\OrderItem\GetAllOrderItems.sql" />
+    <Build Include="StoredProcedures\OrderItem\AddOrderItem.sql" />
+    <Build Include="StoredProcedures\OrderItem\UpdateOrderItem.sql" />
+    <Build Include="StoredProcedures\OrderItem\DeleteOrderItem.sql" />
+    <Build Include="StoredProcedures\Order\GetTotalSalesByDateRange.sql" />
+    <Build Include="StoredProcedures\Order\GetTopSellingProducts.sql" />
+    <Build Include="StoredProcedures\Order\GetCustomerOrderHistory.sql" />
+  </ItemGroup>
 </Project>

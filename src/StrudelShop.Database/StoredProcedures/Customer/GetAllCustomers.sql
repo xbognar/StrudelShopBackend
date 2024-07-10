@@ -1,0 +1,8 @@
+﻿CREATE PROCEDURE GetAllCustomers
+AS
+BEGIN
+	
+	SELECT * FROM Customer;
+
+END
+
