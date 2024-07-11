@@ -1,6 +1,13 @@
+using System.Data;
+using System.Data.SqlClient;
+
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
+
+builder.Services.AddScoped<IDbConnection>((sp) =>
+	new SqlConnection(builder.Configuration.GetConnectionString("StrudelShopDatabase")));
+
 
 //// Register the repositories
 //builder.Services.AddTransient<ICustomerRepository>(provider => new CustomerRepository(builder.Configuration.GetConnectionString("DefaultConnection")));

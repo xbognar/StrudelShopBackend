@@ -94,4 +94,7 @@
     <Build Include="StoredProcedures\Order\GetTopSellingProducts.sql" />
     <Build Include="StoredProcedures\Order\GetCustomerOrderHistory.sql" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="StrudelShop.Database.publish.xml" />
+  </ItemGroup>
 </Project>
