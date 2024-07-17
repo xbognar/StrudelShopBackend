@@ -8,7 +8,7 @@ namespace StrudelShop.DataAccess.DTOs
 {
 	public class OrderDetailsDTO
 	{
-		
+
 		public int OrderItemId { get; set; }
 		
 		public string ProductName { get; set; }
@@ -36,7 +36,7 @@ namespace StrudelShop.DataAccess.DTOs
 		public string CustomerPhoneNumber { get; set; }
 		
 		public string CustomerAddress { get; set; }
-	
+
 	}
 
 }

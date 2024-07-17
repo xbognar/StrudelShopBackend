@@ -1,3 +1,8 @@
+using StrudelShop.DataAccess.DataAccess;
+using StrudelShop.DataAccess.DataAccess.Interfaces;
+using StrudelShop.DataAccess.Services.Interfaces;
+using StrudelShop.Services;
+using StrudelShop.Services.Interfaces;
 using System.Data;
 using System.Data.SqlClient;
 
@@ -8,18 +13,17 @@ builder.Services.AddControllers();
 builder.Services.AddScoped<IDbConnection>((sp) =>
 	new SqlConnection(builder.Configuration.GetConnectionString("StrudelShopDatabase")));
 
+// Register the repositories
+builder.Services.AddTransient<ICustomerRepository, CustomerRepository>();
+builder.Services.AddTransient<IProductRepository, ProductRepository>();
+builder.Services.AddTransient<IOrderRepository, OrderRepository>();
+builder.Services.AddTransient<IOrderItemRepository, OrderItemRepository>();
 
-//// Register the repositories
-//builder.Services.AddTransient<ICustomerRepository>(provider => new CustomerRepository(builder.Configuration.GetConnectionString("DefaultConnection")));
-//builder.Services.AddTransient<IProductRepository>(provider => new ProductRepository(builder.Configuration.GetConnectionString("DefaultConnection")));
-//builder.Services.AddTransient<IOrderRepository>(provider => new OrderRepository(builder.Configuration.GetConnectionString("DefaultConnection")));
-//builder.Services.AddTransient<IOrderItemRepository>(provider => new OrderItemRepository(builder.Configuration.GetConnectionString("DefaultConnection")));
-
-//// Register the services
-//builder.Services.AddTransient<ICustomerService, CustomerService>();
-//builder.Services.AddTransient<IProductService, ProductService>();
-//builder.Services.AddTransient<IOrderService, OrderService>();
-//builder.Services.AddTransient<IOrderItemService, OrderItemService>();
+// Register the services
+builder.Services.AddTransient<ICustomerService, CustomerService>();
+builder.Services.AddTransient<IProductService, ProductService>();
+builder.Services.AddTransient<IOrderService, OrderService>();
+builder.Services.AddTransient<IOrderItemService, OrderItemService>();
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();

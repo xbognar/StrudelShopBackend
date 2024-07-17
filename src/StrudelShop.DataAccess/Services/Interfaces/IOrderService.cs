@@ -4,9 +4,9 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace StrudelShop.DataAccess.DataAccess.Interfaces
+namespace StrudelShop.Services.Interfaces
 {
-	public interface IOrderRepository
+	public interface IOrderService
 	{
 		
 		Task<IEnumerable<Order>> GetAllOrdersAsync();

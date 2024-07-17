@@ -23,7 +23,7 @@ namespace StrudelShop.DataAccess.DataAccess
 
 		public async Task<OrderItem> GetOrderItemByIdAsync(int orderItemId)
 		{
-			return await _dbConnection.QuerySingleOrDefaultAsync<OrderItem>("GetOrderItemById", new { OrderItemID = orderItemId }, commandType: CommandType.StoredProcedure);
+			return await _dbConnection.QuerySingleOrDefaultAsync<OrderItem>("GetOrderItemById", new { OrderItemId = orderItemId }, commandType: CommandType.StoredProcedure);
 		}
 
 		public async Task<int> AddOrderItemAsync(OrderItem orderItem)

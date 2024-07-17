@@ -18,29 +18,29 @@ namespace StrudelShop.DataAccess.DataAccess
 			_dbConnection = dbConnection;
 		}
 
-		public async Task<IEnumerable<OrderDTO>> GetAllOrdersAsync()
+		public async Task<IEnumerable<Order>> GetAllOrdersAsync()
 		{
-			return await _dbConnection.QueryAsync<OrderDTO>("GetAllOrders", commandType: CommandType.StoredProcedure);
+			return await _dbConnection.QueryAsync<Order>("GetAllOrders", commandType: CommandType.StoredProcedure);
 		}
 
-		public async Task<OrderDTO> GetOrderByIdAsync(int orderId)
+		public async Task<Order> GetOrderByIdAsync(int orderId)
 		{
-			return await _dbConnection.QuerySingleOrDefaultAsync<OrderDTO>("GetOrderById", new { OrderID = orderId }, commandType: CommandType.StoredProcedure);
+			return await _dbConnection.QuerySingleOrDefaultAsync<Order>("GetOrderById", new { OrderId = orderId }, commandType: CommandType.StoredProcedure);
 		}
 
-		public async Task<int> CreateOrderAsync(OrderDTO order)
+		public async Task<int> CreateOrderAsync(Order order)
 		{
 			return await _dbConnection.ExecuteAsync("CreateOrder", new { order.CustomerId, order.OrderDate, order.DeliveryDate, order.TotalAmount, order.PaymentStatus }, commandType: CommandType.StoredProcedure);
 		}
 
-		public async Task<int> UpdateOrderAsync(OrderDTO order)
+		public async Task<int> UpdateOrderAsync(Order order)
 		{
 			return await _dbConnection.ExecuteAsync("UpdateOrder", new { order.OrderId, order.CustomerId, order.OrderDate, order.DeliveryDate, order.TotalAmount, order.PaymentStatus }, commandType: CommandType.StoredProcedure);
 		}
 
 		public async Task<int> DeleteOrderAsync(int orderId)
 		{
-			return await _dbConnection.ExecuteAsync("DeleteOrder", new { OrderID = orderId }, commandType: CommandType.StoredProcedure);
+			return await _dbConnection.ExecuteAsync("DeleteOrder", new { OrderId = orderId }, commandType: CommandType.StoredProcedure);
 		}
 
 		public async Task<IEnumerable<OrderDTO>> GetOrdersByDateRangeAsync(DateTime startDate, DateTime endDate)
@@ -50,8 +50,7 @@ namespace StrudelShop.DataAccess.DataAccess
 
 		public async Task<OrderDetailsDTO> GetOrderDetailsAsync(int orderId)
 		{
-			var orderDetails = await _dbConnection.QueryFirstOrDefaultAsync<OrderDetailsDTO>("GetOrderDetails", new { OrderID = orderId }, commandType: CommandType.StoredProcedure);
-			return orderDetails;
+			return await _dbConnection.QueryFirstOrDefaultAsync<OrderDetailsDTO>("GetOrderDetails", new { OrderId = orderId }, commandType: CommandType.StoredProcedure);
 		}
 
 		public async Task<decimal> GetTotalSalesByDateRangeAsync(DateTime startDate, DateTime endDate)

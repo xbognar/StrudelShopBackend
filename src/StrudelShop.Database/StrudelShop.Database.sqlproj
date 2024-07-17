@@ -91,10 +91,7 @@
     <Build Include="StoredProcedures\OrderItem\UpdateOrderItem.sql" />
     <Build Include="StoredProcedures\OrderItem\DeleteOrderItem.sql" />
     <Build Include="StoredProcedures\Order\GetTotalSalesByDateRange.sql" />
-    <Build Include="StoredProcedures\Order\GetTopSellingProducts.sql" />
     <Build Include="StoredProcedures\Order\GetCustomerOrderHistory.sql" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="StrudelShop.Database.publish.xml" />
+    <Build Include="StoredProcedures\Product\GetTopSellingProducts.sql" />
   </ItemGroup>
 </Project>

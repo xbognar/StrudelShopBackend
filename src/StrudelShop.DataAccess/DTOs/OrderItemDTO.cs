@@ -8,7 +8,7 @@ namespace StrudelShop.DataAccess.DTOs
 {
 	public class OrderItemDTO
 	{
-		
+
 		public int OrderItemId { get; set; }
 		
 		public int ProductId { get; set; }
@@ -20,6 +20,6 @@ namespace StrudelShop.DataAccess.DTOs
 		public decimal Price { get; set; }
 		
 		public decimal TotalPrice => Quantity * Price;
-	
+
 	}
 }
