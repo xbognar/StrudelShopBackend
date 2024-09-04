@@ -154,3 +154,25 @@ Dapper is a lightweight and fast object mapper for .NET, used for interacting wi
 ## SQL Server Project
 
 The `StrudelShop.Database` project contains SQL scripts for defining the database schema and stored procedures. This setup includes tables for customers, orders, order items, and products. Each table has corresponding stored procedures for CRUD operations, ensuring a clean separation between the application logic and database interactions.
+
+## Running the Application
+
+To run the application locally, follow these steps:
+
+1. **Clone the Repository**: 
+   ```bash
+   git clone <repository-url>
+   ```
+
+2. **Build the Solution**: Open the solution in Visual Studio and build it to restore all dependencies.
+
+3. **Set Up the Database**: 
+   - Use the SQL Server project to deploy the database schema and stored procedures.
+   - Ensure the connection string in `appsettings.json` is correctly configured to point to your SQL Server instance.
+
+4. **Run the API**: Start the StrudelShop.API project. Swagger UI will be available at `https://localhost:<port>/swagger` for testing the endpoints.
+
+## Conclusion
+
+StrudelShop Backend provides a robust, scalable solution for e-commerce applications, leveraging modern technologies and best practices. With its clear separation of concerns, efficient data access using Dapper, and a well-defined database schema, it is poised for future growth and enhancements.
+
