@@ -165,13 +165,24 @@ To run the application locally, follow these steps:
    cd StrudelShopBackend
    ```
 
-2. **Build the Solution**: Open the solution in Visual Studio and build it to restore all dependencies.
+2. **Set Up the Environment**: 
+   - Ensure that you have a `.env` file in the project root directory. This file should contain the following environment variable for your database connection:
+     ```bash
+     CONNECTION_STRING="Server=<YOUR_SERVER_NAME>;Database=StrudelShop;Trusted_Connection=True;"
+     ```
+     Replace `<YOUR_SERVER_NAME>` with the name of your SQL Server instance.
+     
+3. **Run the Application**: 
+   - Open a terminal or command prompt, navigate to the project root, and use the following command to run the API:
+     ```bash
+     dotnet run --project ./src/StrudelShop.API
+     ```
 
-3. **Set Up the Database**: 
-   - Use the SQL Server project to deploy the database schema and stored procedures.
-   - Ensure the connection string in `appsettings.json` is correctly configured to point to your SQL Server instance.
-
-4. **Run the API**: Start the StrudelShop.API project. Swagger UI will be available at `https://localhost:<port>/swagger` for testing the endpoints.
+4. **Access the API Documentation**: 
+   - Once the application is running, you can access the API documentation through Swagger at the following URL:
+     ```
+     https://localhost:7055/swagger/index.html
+     ```
 
 ## Conclusion
 
