@@ -161,7 +161,8 @@ To run the application locally, follow these steps:
 
 1. **Clone the Repository**: 
    ```bash
-   git clone <repository-url>
+   git clone https://github.com/xbognar/StrudelShopBackend.git
+   cd StrudelShopBackend
    ```
 
 2. **Build the Solution**: Open the solution in Visual Studio and build it to restore all dependencies.
