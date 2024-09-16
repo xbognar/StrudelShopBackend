@@ -17,6 +17,7 @@ namespace StrudelShop.API.Controllers
 			_orderItemService = orderItemService;
 		}
 
+		// GET: api/orderitems
 		[HttpGet]
 		public async Task<ActionResult<IEnumerable<OrderItem>>> GetAllOrderItems()
 		{
@@ -24,6 +25,7 @@ namespace StrudelShop.API.Controllers
 			return Ok(orderItems);
 		}
 
+		// GET: api/orderitems/{orderItemId}
 		[HttpGet("{orderItemId}")]
 		public async Task<ActionResult<OrderItem>> GetOrderItemById(int orderItemId)
 		{
@@ -35,6 +37,7 @@ namespace StrudelShop.API.Controllers
 			return Ok(orderItem);
 		}
 
+		// POST: api/orderitems
 		[HttpPost]
 		public async Task<ActionResult> AddOrderItem(OrderItem orderItem)
 		{
@@ -42,6 +45,7 @@ namespace StrudelShop.API.Controllers
 			return CreatedAtAction(nameof(GetOrderItemById), new { orderItemId = orderItem.OrderItemId }, orderItem);
 		}
 
+		// PUT: api/orderitems/{orderItemId}
 		[HttpPut("{orderItemId}")]
 		public async Task<ActionResult> UpdateOrderItem(int orderItemId, OrderItem orderItem)
 		{
@@ -54,6 +58,7 @@ namespace StrudelShop.API.Controllers
 			return NoContent();
 		}
 
+		// DELETE: api/orderitems/{orderItemId}
 		[HttpDelete("{orderItemId}")]
 		public async Task<ActionResult> DeleteOrderItem(int orderItemId)
 		{

@@ -18,6 +18,7 @@ namespace StrudelShop.API.Controllers
 			_productService = productService;
 		}
 
+		// GET: api/products
 		[HttpGet]
 		public async Task<ActionResult<IEnumerable<Product>>> GetAllProducts()
 		{
@@ -25,6 +26,7 @@ namespace StrudelShop.API.Controllers
 			return Ok(products);
 		}
 
+		// GET: api/products/{productId}
 		[HttpGet("{productId}")]
 		public async Task<ActionResult<Product>> GetProductById(int productId)
 		{
@@ -36,6 +38,7 @@ namespace StrudelShop.API.Controllers
 			return Ok(product);
 		}
 
+		// POST: api/products
 		[HttpPost]
 		public async Task<ActionResult> CreateProduct(Product product)
 		{
@@ -43,6 +46,7 @@ namespace StrudelShop.API.Controllers
 			return CreatedAtAction(nameof(GetProductById), new { productId = product.ProductId }, product);
 		}
 
+		// PUT: api/products/{productId}
 		[HttpPut("{productId}")]
 		public async Task<ActionResult> UpdateProduct(int productId, Product product)
 		{
@@ -55,6 +59,7 @@ namespace StrudelShop.API.Controllers
 			return NoContent();
 		}
 
+		// DELETE: api/products/{productId}
 		[HttpDelete("{productId}")]
 		public async Task<ActionResult> DeleteProduct(int productId)
 		{
@@ -62,6 +67,7 @@ namespace StrudelShop.API.Controllers
 			return NoContent();
 		}
 
+		// GET: api/products/top-selling
 		[HttpGet("top-selling")]
 		public async Task<ActionResult<IEnumerable<TopSellingProductDTO>>> GetTopSellingProducts([FromQuery] int top)
 		{
