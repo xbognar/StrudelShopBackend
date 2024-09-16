@@ -10,8 +10,11 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
 
+// Read connection string from environment variable
+var connectionString = Environment.GetEnvironmentVariable("CONNECTION_STRING");
+
 builder.Services.AddScoped<IDbConnection>((sp) =>
-	new SqlConnection(builder.Configuration.GetConnectionString("StrudelShopDatabase")));
+	new SqlConnection(connectionString));
 
 // Register the repositories
 builder.Services.AddTransient<ICustomerRepository, CustomerRepository>();
