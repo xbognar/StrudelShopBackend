@@ -1,4 +1,3 @@
-
 # StrudelShop Backend
 
 The StrudelShop Backend is a comprehensive backend solution designed for managing customer orders, products, and other related entities for a shopping platform. This backend system is developed using ASP.NET Core Web API and utilizes Dapper for data access, providing a robust and efficient approach to interacting with the SQL Server database.
@@ -9,6 +8,13 @@ The StrudelShop Backend is a comprehensive backend solution designed for managin
 - **Dapper**: A simple object mapper for .NET, providing fast and efficient data access.
 - **SQL Server**: A relational database management system for storing and managing data.
 - **Swagger**: A tool for API documentation and testing.
+- **Docker**: Containerization of both the API and the database for ease of deployment and portability.
+
+## UML Diagram
+
+Below is the UML diagram showing the relationships between the classes:
+
+![Model Relations](https://github.com/xbognar/StrudelShopBackend/blob/master/docs/ModelRelations.png)
 
 ## Project Structure
 
@@ -24,7 +30,7 @@ The solution consists of three main projects:
 
 ```
 StrudelShopBackend/
-│
+|
 ├── src/
 │   ├── StrudelShop.API/
 │   │   ├── Controllers/
@@ -106,8 +112,58 @@ StrudelShopBackend/
 │       │       └── UpdateProduct.sql
 │       └── StrudelShop.Database.sqlproj
 │
-└── README.md
+├── dbscripts/
+│   ├── entrypoint.sh
+│   └── StrudelShop.Database.dacpac
+|
+├── StartBE.bat
+├── StopBE.bat
+├── docker-compose.yaml
+├── Dockerfile
+└── Dockerfile.db
 ```
+
+## Docker Setup
+
+The backend application is containerized using Docker, which simplifies deployment and ensures consistency across different environments.
+
+- **Dockerfile**: Builds an image for the API, including the Data Access Layer.
+- **Dockerfile.db**: Builds an image for the database, applying the schema defined in the SQL project (`StrudelShop.Database`).
+- **docker-compose.yaml**: Coordinates the setup of both the API and the database containers.
+- **dbscripts/entrypoint.sh**: Used during the database container startup to apply the database schema from the `.dacpac` file.
+
+## Running the Application
+
+To run the application locally, follow these steps:
+
+1. **Clone the Repository**: 
+   ```bash
+   git clone https://github.com/xbognar/StrudelShopBackend.git
+   cd StrudelShopBackend
+   ```
+
+2. **Set Up the Environment**: 
+   Ensure that you have a `.env` file in the project root directory. This file should contain the following environment variables:
+     ```bash
+     SA_PASSWORD=YourStrongPasswordHere
+     CONNECTION_STRING="Server=strudelshop_db;Database=StrudelShop;User Id=sa;Password=YourStrongPasswordHere;"
+     JWT_KEY=YourJwtKeyHere
+     AUTH_USERNAME=YourAuthUsername
+     AUTH_PASSWORD=YourAuthPassword
+     ```
+     Replace placeholders with your actual values.
+     
+3. **Start the Backend**:
+   Use the provided batch script to start the backend services:
+   ```
+   StartBE.bat
+   ```
+
+4. **Stop the Backend**:
+   Use the provided batch script to stop the backend services:
+   ```
+   StopBE.bat
+   ```
 
 ## API Endpoints
 
@@ -155,36 +211,6 @@ Dapper is a lightweight and fast object mapper for .NET, used for interacting wi
 
 The `StrudelShop.Database` project contains SQL scripts for defining the database schema and stored procedures. This setup includes tables for customers, orders, order items, and products. Each table has corresponding stored procedures for CRUD operations, ensuring a clean separation between the application logic and database interactions.
 
-## Running the Application
-
-To run the application locally, follow these steps:
-
-1. **Clone the Repository**: 
-   ```bash
-   git clone https://github.com/xbognar/StrudelShopBackend.git
-   cd StrudelShopBackend
-   ```
-
-2. **Set Up the Environment**: 
-   Ensure that you have a `.env` file in the project root directory. This file should contain the following environment variable for your database connection:
-     ```bash
-     CONNECTION_STRING="Server=<YOUR_SERVER_NAME>;Database=StrudelShop;Trusted_Connection=True;"
-     ```
-     Replace `<YOUR_SERVER_NAME>` with the name of your SQL Server instance.
-     
-3. **Run the Application**: 
-   Open a terminal or command prompt, navigate to the project root, and use the following command to run the API:
-     ```bash
-     dotnet run --project ./src/StrudelShop.API
-     ```
-
-4. **Access the API Documentation**: 
-   Once the application is running, you can access the API documentation through Swagger at the following URL:
-     ```
-     https://localhost:7055/swagger/index.html
-     ```
-
 ## Conclusion
 
 StrudelShop Backend provides a robust, scalable solution for e-commerce applications, leveraging modern technologies and best practices. With its clear separation of concerns, efficient data access using Dapper, and a well-defined database schema, it is poised for future growth and enhancements.
-
