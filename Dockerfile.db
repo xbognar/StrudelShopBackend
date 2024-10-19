@@ -1,0 +1,39 @@
+FROM mcr.microsoft.com/mssql/server:2022-latest
+
+# Switch to root user to install packages
+USER root
+
+# Install necessary packages and .NET SDK
+RUN apt-get update && \
+    apt-get install -y wget apt-transport-https && \
+    wget https://packages.microsoft.com/config/ubuntu/22.04/packages-microsoft-prod.deb -O packages-microsoft-prod.deb && \
+    dpkg -i packages-microsoft-prod.deb && \
+    rm packages-microsoft-prod.deb && \
+    apt-get update && \
+    apt-get install -y dotnet-sdk-8.0 && \
+    rm -rf /var/lib/apt/lists/*
+
+# Install SqlPackage as a .NET global tool to /usr/local/bin
+RUN dotnet tool install --tool-path /usr/local/bin microsoft.sqlpackage
+
+# Copy the entrypoint script and DACPAC into the image
+COPY ./dbscripts /data
+
+# Ensure the entrypoint script has executable permissions
+RUN chmod +x /data/entrypoint.sh
+
+# Set ownership to mssql user
+RUN chown -R mssql /data
+
+# Switch back to mssql user
+USER mssql
+
+# Set environment variables
+ENV SA_PASSWORD=$SA_PASSWORD \
+    ACCEPT_EULA=Y
+
+# Expose SQL Server port
+EXPOSE 1433
+
+# Set the entrypoint
+ENTRYPOINT [ "/bin/bash", "/data/entrypoint.sh" ]

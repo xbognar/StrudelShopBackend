@@ -4,9 +4,11 @@ using StrudelShop.DataAccess.Models;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using StrudelShop.DataAccess.Services.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 
 namespace StrudelShop.API.Controllers
 {
+	[Authorize]
 	[ApiController]
 	[Route("api/[controller]")]
 	public class CustomersController : ControllerBase

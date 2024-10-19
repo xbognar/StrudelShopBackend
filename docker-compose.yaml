@@ -1,0 +1,36 @@
+version: '3.8'
+
+services:
+  db:
+    build:
+      context: .
+      dockerfile: Dockerfile.db
+    container_name: strudelshop_db
+    environment:
+      SA_PASSWORD: ${SA_PASSWORD}
+      ACCEPT_EULA: Y
+    ports:
+      - "1433:1433"
+    volumes:
+      - sql_data:/var/opt/mssql
+
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: strudelshop_api
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      CONNECTION_STRING: ${CONNECTION_STRING}
+      JWT_KEY: ${JWT_KEY}
+      AUTH_USERNAME: ${AUTH_USERNAME}
+      AUTH_PASSWORD: ${AUTH_PASSWORD}
+    ports:
+      - "5000:80"
+    depends_on:
+      - db
+    env_file:
+      - .env
+
+volumes:
+  sql_data:
