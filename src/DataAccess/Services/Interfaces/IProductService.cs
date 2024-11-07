@@ -12,8 +12,6 @@ namespace StrudelShop.DataAccess.Services.Interfaces
 		Task CreateProductAsync(Product product);
 		Task UpdateProductAsync(Product product);
 		Task DeleteProductAsync(int productId);
-
-		Task<IEnumerable<TopProductDTO>> GetTopProductsAsync();
 		Task<IEnumerable<TopSellingProductDTO>> GetTopSellingProductsAsync();
 		Task<IEnumerable<ProductOverviewDTO>> GetProductOverviewAsync();
 	}

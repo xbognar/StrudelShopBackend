@@ -2,6 +2,8 @@
 using Microsoft.EntityFrameworkCore;
 using StrudelShop.DataAccess.DataAccess;
 using StrudelShop.DataAccess.Services.Interfaces;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace DataAccess.Services
 {
@@ -46,5 +48,4 @@ namespace DataAccess.Services
 			}
 		}
 	}
-
 }

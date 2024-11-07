@@ -2,6 +2,8 @@
 using DataAccess.Models;
 using Microsoft.AspNetCore.Mvc;
 using StrudelShop.DataAccess.Services.Interfaces;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace WebAPI.Controllers
 {
@@ -16,6 +18,13 @@ namespace WebAPI.Controllers
 			_orderService = orderService;
 		}
 
+		[HttpGet]
+		public async Task<ActionResult<IEnumerable<Order>>> GetAllOrders()
+		{
+			var orders = await _orderService.GetAllOrdersAsync();
+			return Ok(orders);
+		}
+
 		[HttpGet("{id}")]
 		public async Task<ActionResult<Order>> GetOrderById(int id)
 		{
@@ -23,13 +32,6 @@ namespace WebAPI.Controllers
 			if (order == null)
 				return NotFound();
 			return Ok(order);
-		}
-
-		[HttpGet]
-		public async Task<ActionResult<IEnumerable<Order>>> GetAllOrders()
-		{
-			var orders = await _orderService.GetAllOrdersAsync();
-			return Ok(orders);
 		}
 
 		[HttpPost]
@@ -56,7 +58,6 @@ namespace WebAPI.Controllers
 			return NoContent();
 		}
 
-		// Additional endpoints using DTOs
 		[HttpGet("history/{userId}")]
 		public async Task<ActionResult<IEnumerable<OrderHistoryDTO>>> GetOrderHistory(int userId)
 		{
@@ -78,5 +79,4 @@ namespace WebAPI.Controllers
 			return Ok(summaries);
 		}
 	}
-
 }

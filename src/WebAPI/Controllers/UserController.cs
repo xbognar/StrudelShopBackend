@@ -1,6 +1,8 @@
 ﻿using DataAccess.Models;
 using Microsoft.AspNetCore.Mvc;
 using StrudelShop.DataAccess.Services.Interfaces;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace WebAPI.Controllers
 {
@@ -15,6 +17,13 @@ namespace WebAPI.Controllers
 			_userService = userService;
 		}
 
+		[HttpGet]
+		public async Task<ActionResult<IEnumerable<User>>> GetAllUsers()
+		{
+			var users = await _userService.GetAllUsersAsync();
+			return Ok(users);
+		}
+
 		[HttpGet("{id}")]
 		public async Task<ActionResult<User>> GetUserById(int id)
 		{
@@ -22,13 +31,6 @@ namespace WebAPI.Controllers
 			if (user == null)
 				return NotFound();
 			return Ok(user);
-		}
-
-		[HttpGet]
-		public async Task<ActionResult<IEnumerable<User>>> GetAllUsers()
-		{
-			var users = await _userService.GetAllUsersAsync();
-			return Ok(users);
 		}
 
 		[HttpPost]
@@ -55,5 +57,4 @@ namespace WebAPI.Controllers
 			return NoContent();
 		}
 	}
-
 }

@@ -1,6 +1,8 @@
 ﻿using DataAccess.Models;
 using Microsoft.AspNetCore.Mvc;
 using StrudelShop.DataAccess.Services.Interfaces;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace WebAPI.Controllers
 {
@@ -15,6 +17,13 @@ namespace WebAPI.Controllers
 			_productImageService = productImageService;
 		}
 
+		[HttpGet]
+		public async Task<ActionResult<IEnumerable<ProductImage>>> GetAllProductImages()
+		{
+			var productImages = await _productImageService.GetAllProductImagesAsync();
+			return Ok(productImages);
+		}
+
 		[HttpGet("{id}")]
 		public async Task<ActionResult<ProductImage>> GetProductImageById(int id)
 		{
@@ -22,13 +31,6 @@ namespace WebAPI.Controllers
 			if (productImage == null)
 				return NotFound();
 			return Ok(productImage);
-		}
-
-		[HttpGet]
-		public async Task<ActionResult<IEnumerable<ProductImage>>> GetAllProductImages()
-		{
-			var productImages = await _productImageService.GetAllProductImagesAsync();
-			return Ok(productImages);
 		}
 
 		[HttpPost]
@@ -55,5 +57,4 @@ namespace WebAPI.Controllers
 			return NoContent();
 		}
 	}
-
 }

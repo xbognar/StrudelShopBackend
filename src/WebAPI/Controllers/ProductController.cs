@@ -2,6 +2,8 @@
 using DataAccess.Models;
 using Microsoft.AspNetCore.Mvc;
 using StrudelShop.DataAccess.Services.Interfaces;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace WebAPI.Controllers
 {
@@ -16,6 +18,13 @@ namespace WebAPI.Controllers
 			_productService = productService;
 		}
 
+		[HttpGet]
+		public async Task<ActionResult<IEnumerable<Product>>> GetAllProducts()
+		{
+			var products = await _productService.GetAllProductsAsync();
+			return Ok(products);
+		}
+
 		[HttpGet("{id}")]
 		public async Task<ActionResult<Product>> GetProductById(int id)
 		{
@@ -23,13 +32,6 @@ namespace WebAPI.Controllers
 			if (product == null)
 				return NotFound();
 			return Ok(product);
-		}
-
-		[HttpGet]
-		public async Task<ActionResult<IEnumerable<Product>>> GetAllProducts()
-		{
-			var products = await _productService.GetAllProductsAsync();
-			return Ok(products);
 		}
 
 		[HttpPost]
@@ -56,14 +58,6 @@ namespace WebAPI.Controllers
 			return NoContent();
 		}
 
-		// Additional endpoints using DTOs
-		[HttpGet("top")]
-		public async Task<ActionResult<IEnumerable<TopProductDTO>>> GetTopProducts()
-		{
-			var topProducts = await _productService.GetTopProductsAsync();
-			return Ok(topProducts);
-		}
-
 		[HttpGet("top-selling")]
 		public async Task<ActionResult<IEnumerable<TopSellingProductDTO>>> GetTopSellingProducts()
 		{
@@ -78,5 +72,4 @@ namespace WebAPI.Controllers
 			return Ok(overview);
 		}
 	}
-
 }

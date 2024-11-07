@@ -1,6 +1,7 @@
 ﻿using DataAccess.DTOs;
 using DataAccess.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
+using System.Threading.Tasks;
 
 namespace WebAPI.Controllers
 {
@@ -24,5 +25,4 @@ namespace WebAPI.Controllers
 			return Ok(response);
 		}
 	}
-
 }

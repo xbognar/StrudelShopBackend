@@ -1,4 +1,5 @@
-﻿using System;
+﻿using DataAccess.Models;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -22,6 +23,6 @@ namespace DataAccess.DTOs
 		public string CustomerAddress { get; set; }
 
 		// List of order items
-		public List<OrderItemDTO> OrderItems { get; set; }
+		public List<OrderItem> OrderItems { get; set; }
 	}
 }

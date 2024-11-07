@@ -3,10 +3,7 @@ using DataAccess.Models;
 using Microsoft.EntityFrameworkCore;
 using StrudelShop.DataAccess.DataAccess;
 using StrudelShop.DataAccess.Services.Interfaces;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace DataAccess.Services
@@ -28,7 +25,7 @@ namespace DataAccess.Services
 
 		public async Task<IEnumerable<Product>> GetAllProductsAsync()
 		{
-			return await _context.Products.ToListAsync();
+			return await _context.Products.Include(p => p.ProductImages).ToListAsync();
 		}
 
 		public async Task CreateProductAsync(Product product)
@@ -53,17 +50,33 @@ namespace DataAccess.Services
 			}
 		}
 
-		public async Task<IEnumerable<TopProductDTO>> GetTopProductsAsync()
-		{
-		}
-
 		public async Task<IEnumerable<TopSellingProductDTO>> GetTopSellingProductsAsync()
 		{
+			var topSellingProducts = await _context.OrderItems
+				.GroupBy(oi => oi.ProductID)
+				.Select(group => new TopSellingProductDTO
+				{
+					Name = _context.Products.FirstOrDefault(p => p.ProductID == group.Key).Name,
+					TotalSold = group.Sum(oi => oi.Quantity)
+				})
+				.OrderByDescending(dto => dto.TotalSold)
+				.ToListAsync();
+
+			return topSellingProducts;
 		}
 
 		public async Task<IEnumerable<ProductOverviewDTO>> GetProductOverviewAsync()
 		{
+			return await _context.Products
+				.Select(p => new ProductOverviewDTO
+				{
+					ProductId = p.ProductID,
+					Name = p.Name,
+					Price = p.Price,
+					MainImageURL = p.ImageURL,
+					StockQuantity = p.ProductImages.Count
+				})
+				.ToListAsync();
 		}
 	}
-
 }
