@@ -1,5 +1,6 @@
 ﻿using DataAccess.DTOs;
 using DataAccess.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using StrudelShop.DataAccess.Services.Interfaces;
 using System.Collections.Generic;
@@ -18,6 +19,7 @@ namespace WebAPI.Controllers
 			_productService = productService;
 		}
 
+		[AllowAnonymous]
 		[HttpGet]
 		public async Task<ActionResult<IEnumerable<Product>>> GetAllProducts()
 		{
@@ -25,6 +27,7 @@ namespace WebAPI.Controllers
 			return Ok(products);
 		}
 
+		[AllowAnonymous]
 		[HttpGet("{id}")]
 		public async Task<ActionResult<Product>> GetProductById(int id)
 		{
@@ -34,6 +37,7 @@ namespace WebAPI.Controllers
 			return Ok(product);
 		}
 
+		[Authorize(Roles = "Admin")]
 		[HttpPost]
 		public async Task<ActionResult> CreateProduct(Product product)
 		{
@@ -41,6 +45,7 @@ namespace WebAPI.Controllers
 			return CreatedAtAction(nameof(GetProductById), new { id = product.ProductID }, product);
 		}
 
+		[Authorize(Roles = "Admin")]
 		[HttpPut("{id}")]
 		public async Task<ActionResult> UpdateProduct(int id, Product product)
 		{
@@ -51,6 +56,7 @@ namespace WebAPI.Controllers
 			return NoContent();
 		}
 
+		[Authorize(Roles = "Admin")]
 		[HttpDelete("{id}")]
 		public async Task<ActionResult> DeleteProduct(int id)
 		{
@@ -58,6 +64,7 @@ namespace WebAPI.Controllers
 			return NoContent();
 		}
 
+		[AllowAnonymous]
 		[HttpGet("top-selling")]
 		public async Task<ActionResult<IEnumerable<TopSellingProductDTO>>> GetTopSellingProducts()
 		{
@@ -65,6 +72,7 @@ namespace WebAPI.Controllers
 			return Ok(topSellingProducts);
 		}
 
+		[Authorize(Roles = "Admin")]
 		[HttpGet("overview")]
 		public async Task<ActionResult<IEnumerable<ProductOverviewDTO>>> GetProductOverview()
 		{

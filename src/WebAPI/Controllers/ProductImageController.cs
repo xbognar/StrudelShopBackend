@@ -1,4 +1,5 @@
 ﻿using DataAccess.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using StrudelShop.DataAccess.Services.Interfaces;
 using System.Collections.Generic;
@@ -6,6 +7,7 @@ using System.Threading.Tasks;
 
 namespace WebAPI.Controllers
 {
+	[Authorize(Roles = "Admin")]
 	[ApiController]
 	[Route("api/[controller]")]
 	public class ProductImageController : ControllerBase

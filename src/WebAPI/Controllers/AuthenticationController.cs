@@ -1,5 +1,7 @@
 ﻿using DataAccess.DTOs;
+using DataAccess.Models;
 using DataAccess.Services.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
 
@@ -16,6 +18,17 @@ namespace WebAPI.Controllers
 			_authService = authService;
 		}
 
+		[AllowAnonymous]
+		[HttpPost("register")]
+		public async Task<ActionResult> Register([FromBody] User newUser)
+		{
+			var isRegistered = await _authService.RegisterUserAsync(newUser);
+			if (!isRegistered)
+				return BadRequest("Registration failed.");
+			return Ok("Registration successful");
+		}
+
+		[AllowAnonymous]
 		[HttpPost("login")]
 		public async Task<ActionResult<LoginResponseDTO>> Login([FromBody] LoginRequestDTO loginRequest)
 		{

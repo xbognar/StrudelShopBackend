@@ -1,5 +1,6 @@
 ﻿using DataAccess.DTOs;
 using DataAccess.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using StrudelShop.DataAccess.Services.Interfaces;
 using System.Collections.Generic;
@@ -7,6 +8,7 @@ using System.Threading.Tasks;
 
 namespace WebAPI.Controllers
 {
+	[Authorize]
 	[ApiController]
 	[Route("api/[controller]")]
 	public class OrderController : ControllerBase
@@ -18,6 +20,7 @@ namespace WebAPI.Controllers
 			_orderService = orderService;
 		}
 
+		[Authorize(Roles = "Admin")]
 		[HttpGet]
 		public async Task<ActionResult<IEnumerable<Order>>> GetAllOrders()
 		{
@@ -25,6 +28,7 @@ namespace WebAPI.Controllers
 			return Ok(orders);
 		}
 
+		[Authorize(Roles = "User,Admin")]
 		[HttpGet("{id}")]
 		public async Task<ActionResult<Order>> GetOrderById(int id)
 		{
@@ -34,6 +38,7 @@ namespace WebAPI.Controllers
 			return Ok(order);
 		}
 
+		[Authorize(Roles = "User")]
 		[HttpPost]
 		public async Task<ActionResult> CreateOrder(Order order)
 		{
@@ -41,6 +46,7 @@ namespace WebAPI.Controllers
 			return CreatedAtAction(nameof(GetOrderById), new { id = order.OrderID }, order);
 		}
 
+		[Authorize(Roles = "Admin")]
 		[HttpPut("{id}")]
 		public async Task<ActionResult> UpdateOrder(int id, Order order)
 		{
@@ -51,6 +57,7 @@ namespace WebAPI.Controllers
 			return NoContent();
 		}
 
+		[Authorize(Roles = "Admin")]
 		[HttpDelete("{id}")]
 		public async Task<ActionResult> DeleteOrder(int id)
 		{
@@ -58,6 +65,7 @@ namespace WebAPI.Controllers
 			return NoContent();
 		}
 
+		[Authorize(Roles = "User")]
 		[HttpGet("history/{userId}")]
 		public async Task<ActionResult<IEnumerable<OrderHistoryDTO>>> GetOrderHistory(int userId)
 		{
@@ -65,6 +73,7 @@ namespace WebAPI.Controllers
 			return Ok(orderHistory);
 		}
 
+		[Authorize(Roles = "User,Admin")]
 		[HttpGet("details/{id}")]
 		public async Task<ActionResult<OrderDetailsDTO>> GetOrderDetails(int id)
 		{
@@ -72,6 +81,7 @@ namespace WebAPI.Controllers
 			return Ok(orderDetails);
 		}
 
+		[Authorize(Roles = "Admin")]
 		[HttpGet("summary")]
 		public async Task<ActionResult<IEnumerable<CustomerOrderSummaryDTO>>> GetCustomerOrderSummaries()
 		{
