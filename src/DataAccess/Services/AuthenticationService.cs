@@ -87,12 +87,12 @@ namespace DataAccess.Services
 
 		private bool VerifyPassword(string password, string storedHash)
 		{
-			return password == storedHash; // Replace with actual password hashing and verification
+			return password == storedHash;
 		}
 
 		private string HashPassword(string password)
 		{
-			return password; // Replace with actual password hashing
+			return password;
 		}
 	}
 }

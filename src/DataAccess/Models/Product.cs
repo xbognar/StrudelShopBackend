@@ -12,9 +12,7 @@ namespace DataAccess.Models
 		public string Name { get; set; }
 		public string Description { get; set; }
 		public decimal Price { get; set; }
-		public string ImageURL { get; set; }  // Main catalog image
-
-		// Navigation property for additional images
+		public string ImageURL { get; set; }
 		public ICollection<ProductImage> ProductImages { get; set; }
 	}
 

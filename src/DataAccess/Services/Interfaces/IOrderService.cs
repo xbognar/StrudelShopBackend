@@ -12,7 +12,6 @@ namespace StrudelShop.DataAccess.Services.Interfaces
 		Task CreateOrderAsync(Order order);
 		Task UpdateOrderAsync(Order order);
 		Task DeleteOrderAsync(int orderId);
-
 		Task<IEnumerable<OrderHistoryDTO>> GetOrderHistoryAsync(int userId);
 		Task<OrderDetailsDTO> GetOrderDetailsAsync(int orderId);
 		Task<IEnumerable<CustomerOrderSummaryDTO>> GetCustomerOrderSummariesAsync();

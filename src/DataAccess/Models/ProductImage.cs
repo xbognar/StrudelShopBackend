@@ -10,9 +10,7 @@ namespace DataAccess.Models
 	{
 		public int ImageID { get; set; }
 		public int ProductID { get; set; }
-		public string ImageURL { get; set; }  // URL for each additional image
-
-		// Navigation property
+		public string ImageURL { get; set; }
 		public Product Product { get; set; }
 	}
 

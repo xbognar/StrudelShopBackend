@@ -14,15 +14,11 @@ namespace DataAccess.DTOs
 		public DateTime DeliveryDate { get; set; }
 		public decimal OrderTotalAmount { get; set; }
 		public string PaymentStatus { get; set; }
-
-		// User Information (for Admin views)
 		public string CustomerFirstName { get; set; }
 		public string CustomerLastName { get; set; }
 		public string CustomerEmail { get; set; }
 		public string CustomerPhoneNumber { get; set; }
 		public string CustomerAddress { get; set; }
-
-		// List of order items
 		public List<OrderItem> OrderItems { get; set; }
 	}
 }

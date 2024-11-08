@@ -1,7 +1,5 @@
 ﻿using DataAccess.Models;
 using Microsoft.EntityFrameworkCore;
-using System.Collections.Generic;
-using System.Reflection.Emit;
 
 namespace StrudelShop.DataAccess.DataAccess
 {
@@ -17,20 +15,26 @@ namespace StrudelShop.DataAccess.DataAccess
 
 		protected override void OnModelCreating(ModelBuilder modelBuilder)
 		{
+			modelBuilder.Entity<ProductImage>()
+				.HasKey(pi => pi.ImageID);
+
 			modelBuilder.Entity<Product>()
 				.HasMany(p => p.ProductImages)
 				.WithOne(pi => pi.Product)
-				.HasForeignKey(pi => pi.ProductID);
+				.HasForeignKey(pi => pi.ProductID)
+				.OnDelete(DeleteBehavior.Cascade);
 
 			modelBuilder.Entity<Order>()
 				.HasMany(o => o.OrderItems)
 				.WithOne(oi => oi.Order)
-				.HasForeignKey(oi => oi.OrderID);
+				.HasForeignKey(oi => oi.OrderID)
+				.OnDelete(DeleteBehavior.Cascade);
 
 			modelBuilder.Entity<User>()
 				.HasMany(u => u.Orders)
 				.WithOne(o => o.User)
-				.HasForeignKey(o => o.UserID);
+				.HasForeignKey(o => o.UserID)
+				.OnDelete(DeleteBehavior.Cascade);
 
 			base.OnModelCreating(modelBuilder);
 		}
