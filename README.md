@@ -73,12 +73,12 @@ StrudelShopBackend/
 │       │   └── UserController.cs
 │       ├── appsettings.json
 │       ├── appsettings.Development.json
+│       ├── Dockerfile
 │       └── Program.cs
 |
 ├── StartBE.bat
 ├── StopBE.bat
-├── docker-compose.yaml
-└── Dockerfile
+└── docker-compose.yaml
 ```
 
 ## Docker Setup
@@ -102,7 +102,7 @@ To run the application locally, follow these steps:
    Ensure that you have a `.env` file in the project root directory. This file should contain the following environment variables:
      ```bash
      SA_PASSWORD=YourStrongPasswordHere
-     CONNECTION_STRING="Server=strudelshop_db;Database=StrudelShop;User Id=sa;Password=YourStrongPasswordHere;"
+     CONNECTION_STRING="Server=mssql;Database=StrudelShop;User Id=sa;Password=YourStrongPasswordHere;"
      JWT_KEY=YourJwtKeyHere
      AUTH_USERNAME=YourAuthUsername
      AUTH_PASSWORD=YourAuthPassword
