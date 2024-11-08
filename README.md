@@ -15,7 +15,7 @@ The StrudelShop Backend is a comprehensive backend solution designed for managin
 
 Below is the UML diagram showing the relationships between the classes:
 
-![Model Relations](https://github.com/xbognar/StrudelShopBackend/blob/master/docs/ModelRelations.png)
+![Model Relations](https://github.com/xbognar/StrudelShopBackend/blob/master/docs/TableRelations.png)
 
 ## Project Structure
 
