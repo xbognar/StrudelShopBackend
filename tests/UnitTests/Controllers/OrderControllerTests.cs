@@ -22,6 +22,9 @@ namespace UnitTests.Controllers
 			_controller = new OrderController(_orderServiceMock.Object);
 		}
 
+		/// <summary>
+		/// Tests that GetAllOrders returns OkObjectResult with a list of orders.
+		/// </summary>
 		[Fact]
 		public async Task GetAllOrders_ReturnsOkWithOrders()
 		{
@@ -38,6 +41,9 @@ namespace UnitTests.Controllers
 			returnedOrders.Should().HaveCount(2);
 		}
 
+		/// <summary>
+		/// Tests that GetOrderById returns OkObjectResult when the order is found.
+		/// </summary>
 		[Fact]
 		public async Task GetOrderById_WhenFound_ReturnsOkWithOrder()
 		{
@@ -54,6 +60,9 @@ namespace UnitTests.Controllers
 			returnedOrder.OrderID.Should().Be(10);
 		}
 
+		/// <summary>
+		/// Tests that GetOrderById returns NotFound when the order does not exist.
+		/// </summary>
 		[Fact]
 		public async Task GetOrderById_WhenNotFound_ReturnsNotFound()
 		{
@@ -67,6 +76,9 @@ namespace UnitTests.Controllers
 			Assert.IsType<NotFoundResult>(result);
 		}
 
+		/// <summary>
+		/// Tests that CreateOrder returns CreatedAtAction when a new order is successfully created.
+		/// </summary>
 		[Fact]
 		public async Task CreateOrder_ReturnsCreatedAtAction()
 		{
@@ -83,6 +95,9 @@ namespace UnitTests.Controllers
 			createdResult.Value.Should().Be(newOrder);
 		}
 
+		/// <summary>
+		/// Tests that UpdateOrder returns NoContent if the ID matches and service update succeeds.
+		/// </summary>
 		[Fact]
 		public async Task UpdateOrder_WhenIdMatchesAndServiceSucceeds_ReturnsNoContent()
 		{
@@ -97,6 +112,9 @@ namespace UnitTests.Controllers
 			Assert.IsType<NoContentResult>(result);
 		}
 
+		/// <summary>
+		/// Tests that UpdateOrder returns BadRequest if the route ID does not match the order's ID.
+		/// </summary>
 		[Fact]
 		public async Task UpdateOrder_WhenIdMismatch_ReturnsBadRequest()
 		{
@@ -110,6 +128,9 @@ namespace UnitTests.Controllers
 			Assert.IsType<BadRequestResult>(result);
 		}
 
+		/// <summary>
+		/// Tests that DeleteOrder returns NoContent on successful deletion.
+		/// </summary>
 		[Fact]
 		public async Task DeleteOrder_ReturnsNoContent()
 		{
@@ -123,6 +144,9 @@ namespace UnitTests.Controllers
 			Assert.IsType<NoContentResult>(result);
 		}
 
+		/// <summary>
+		/// Tests that GetOrderHistory returns OkObjectResult with a list of OrderHistoryDTO.
+		/// </summary>
 		[Fact]
 		public async Task GetOrderHistory_ReturnsOkWithHistory()
 		{
@@ -145,6 +169,9 @@ namespace UnitTests.Controllers
 			returnedHistory.Should().HaveCount(2);
 		}
 
+		/// <summary>
+		/// Tests that GetOrderDetails returns OkObjectResult with the correct OrderDetailsDTO.
+		/// </summary>
 		[Fact]
 		public async Task GetOrderDetails_ReturnsOkWithDetails()
 		{
@@ -161,6 +188,9 @@ namespace UnitTests.Controllers
 			returnedDetails.OrderId.Should().Be(5);
 		}
 
+		/// <summary>
+		/// Tests that GetCustomerOrderSummaries returns OkObjectResult with a list of summaries.
+		/// </summary>
 		[Fact]
 		public async Task GetCustomerOrderSummaries_ReturnsOkWithSummaries()
 		{

@@ -21,6 +21,9 @@ namespace UnitTests.Controllers
 			_controller = new UserController(_userServiceMock.Object);
 		}
 
+		/// <summary>
+		/// Tests that the GetAllUsers endpoint returns an Ok result with a list of users.
+		/// </summary>
 		[Fact]
 		public async Task GetAllUsers_ReturnsOkWithList()
 		{
@@ -41,6 +44,9 @@ namespace UnitTests.Controllers
 			returnedUsers.Should().HaveCount(2);
 		}
 
+		/// <summary>
+		/// Tests that GetUserById returns an Ok result with the matching user when found.
+		/// </summary>
 		[Fact]
 		public async Task GetUserById_WhenFound_ReturnsOk()
 		{
@@ -57,6 +63,9 @@ namespace UnitTests.Controllers
 			returnedUser.UserID.Should().Be(10);
 		}
 
+		/// <summary>
+		/// Tests that GetUserById returns NotFound when the user does not exist.
+		/// </summary>
 		[Fact]
 		public async Task GetUserById_WhenNotFound_ReturnsNotFound()
 		{
@@ -70,6 +79,9 @@ namespace UnitTests.Controllers
 			Assert.IsType<NotFoundResult>(result);
 		}
 
+		/// <summary>
+		/// Tests that CreateUser returns CreatedAtAction with the correct route values.
+		/// </summary>
 		[Fact]
 		public async Task CreateUser_ReturnsCreatedAtAction()
 		{
@@ -86,6 +98,9 @@ namespace UnitTests.Controllers
 			createdResult.Value.Should().Be(newUser);
 		}
 
+		/// <summary>
+		/// Tests that UpdateUser returns NoContent when the provided ID matches the user's ID.
+		/// </summary>
 		[Fact]
 		public async Task UpdateUser_WhenIdMatches_ReturnsNoContent()
 		{
@@ -100,6 +115,9 @@ namespace UnitTests.Controllers
 			Assert.IsType<NoContentResult>(result);
 		}
 
+		/// <summary>
+		/// Tests that UpdateUser returns BadRequest when the path ID does not match the user's ID.
+		/// </summary>
 		[Fact]
 		public async Task UpdateUser_WhenIdMismatch_ReturnsBadRequest()
 		{
@@ -113,6 +131,9 @@ namespace UnitTests.Controllers
 			Assert.IsType<BadRequestResult>(result);
 		}
 
+		/// <summary>
+		/// Tests that DeleteUser returns NoContent when the user is successfully deleted.
+		/// </summary>
 		[Fact]
 		public async Task DeleteUser_ReturnsNoContent()
 		{

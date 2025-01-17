@@ -21,6 +21,9 @@ namespace UnitTests.Controllers
 			_controller = new OrderItemController(_orderItemServiceMock.Object);
 		}
 
+		/// <summary>
+		/// Tests that GetAllOrderItems returns Ok with a list of OrderItem objects.
+		/// </summary>
 		[Fact]
 		public async Task GetAllOrderItems_ReturnsOkWithList()
 		{
@@ -37,6 +40,9 @@ namespace UnitTests.Controllers
 			returnedItems.Should().HaveCount(2);
 		}
 
+		/// <summary>
+		/// Tests that GetOrderItemById returns Ok with an OrderItem when found.
+		/// </summary>
 		[Fact]
 		public async Task GetOrderItemById_WhenFound_ReturnsOk()
 		{
@@ -53,6 +59,9 @@ namespace UnitTests.Controllers
 			returnedItem.OrderItemID.Should().Be(10);
 		}
 
+		/// <summary>
+		/// Tests that GetOrderItemById returns NotFound when the item does not exist.
+		/// </summary>
 		[Fact]
 		public async Task GetOrderItemById_WhenNotFound_ReturnsNotFound()
 		{
@@ -66,6 +75,9 @@ namespace UnitTests.Controllers
 			Assert.IsType<NotFoundResult>(result);
 		}
 
+		/// <summary>
+		/// Tests that CreateOrderItem returns CreatedAtAction for a new order item.
+		/// </summary>
 		[Fact]
 		public async Task CreateOrderItem_ReturnsCreatedAtAction()
 		{
@@ -82,6 +94,9 @@ namespace UnitTests.Controllers
 			createdResult.Value.Should().Be(newItem);
 		}
 
+		/// <summary>
+		/// Tests that UpdateOrderItem returns NoContent when the IDs match.
+		/// </summary>
 		[Fact]
 		public async Task UpdateOrderItem_WhenIdMatches_ReturnsNoContent()
 		{
@@ -96,6 +111,9 @@ namespace UnitTests.Controllers
 			Assert.IsType<NoContentResult>(result);
 		}
 
+		/// <summary>
+		/// Tests that UpdateOrderItem returns BadRequest when the path ID does not match the object’s ID.
+		/// </summary>
 		[Fact]
 		public async Task UpdateOrderItem_WhenIdMismatch_ReturnsBadRequest()
 		{
@@ -109,6 +127,9 @@ namespace UnitTests.Controllers
 			Assert.IsType<BadRequestResult>(result);
 		}
 
+		/// <summary>
+		/// Tests that DeleteOrderItem returns NoContent when the item is deleted.
+		/// </summary>
 		[Fact]
 		public async Task DeleteOrderItem_ReturnsNoContent()
 		{

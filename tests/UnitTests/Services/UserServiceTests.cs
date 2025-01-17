@@ -31,6 +31,9 @@ namespace UnitTests.Services
 			_userService = new UserService(_dbContextMock.Object);
 		}
 
+		/// <summary>
+		/// Tests that GetUserByIdAsync returns the user when the user is found.
+		/// </summary>
 		[Fact]
 		public async Task GetUserByIdAsync_WhenUserExists_ReturnsUser()
 		{
@@ -49,6 +52,9 @@ namespace UnitTests.Services
 			result.Username.Should().Be("Alice");
 		}
 
+		/// <summary>
+		/// Tests that GetUserByIdAsync returns null when the user does not exist.
+		/// </summary>
 		[Fact]
 		public async Task GetUserByIdAsync_WhenUserNotFound_ReturnsNull()
 		{
@@ -64,6 +70,9 @@ namespace UnitTests.Services
 			result.Should().BeNull();
 		}
 
+		/// <summary>
+		/// Tests that GetAllUsersAsync returns the full list of users in the DbSet.
+		/// </summary>
 		[Fact]
 		public async Task GetAllUsersAsync_ReturnsAllUsers()
 		{
@@ -87,6 +96,9 @@ namespace UnitTests.Services
 			result.Should().HaveCount(2);
 		}
 
+		/// <summary>
+		/// Tests that CreateUserAsync adds a new user and calls SaveChanges once.
+		/// </summary>
 		[Fact]
 		public async Task CreateUserAsync_SavesUserAndCallsSaveChanges()
 		{
@@ -101,6 +113,9 @@ namespace UnitTests.Services
 			_dbContextMock.Verify(db => db.SaveChangesAsync(default), Times.Once);
 		}
 
+		/// <summary>
+		/// Tests that UpdateUserAsync updates the user entity and calls SaveChanges once.
+		/// </summary>
 		[Fact]
 		public async Task UpdateUserAsync_UpdatesUserAndCallsSaveChanges()
 		{
@@ -115,6 +130,9 @@ namespace UnitTests.Services
 			_dbContextMock.Verify(db => db.SaveChangesAsync(default), Times.Once);
 		}
 
+		/// <summary>
+		/// Tests that DeleteUserAsync removes the user if it is found.
+		/// </summary>
 		[Fact]
 		public async Task DeleteUserAsync_WhenUserExists_DeletesUser()
 		{
@@ -130,6 +148,9 @@ namespace UnitTests.Services
 			_dbContextMock.Verify(db => db.SaveChangesAsync(default), Times.Once);
 		}
 
+		/// <summary>
+		/// Tests that DeleteUserAsync does nothing if the user is not found.
+		/// </summary>
 		[Fact]
 		public async Task DeleteUserAsync_WhenUserDoesNotExist_DoesNothing()
 		{

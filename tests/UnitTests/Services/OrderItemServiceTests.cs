@@ -28,6 +28,9 @@ namespace UnitTests.Services
 			_service = new OrderItemService(_dbContextMock.Object);
 		}
 
+		/// <summary>
+		/// Tests that GetOrderItemByIdAsync returns the item if it is found.
+		/// </summary>
 		[Fact]
 		public async Task GetOrderItemByIdAsync_WhenFound_ReturnsItem()
 		{
@@ -43,6 +46,9 @@ namespace UnitTests.Services
 			result.OrderItemID.Should().Be(1);
 		}
 
+		/// <summary>
+		/// Tests that GetOrderItemByIdAsync returns null if the item does not exist.
+		/// </summary>
 		[Fact]
 		public async Task GetOrderItemByIdAsync_WhenNotFound_ReturnsNull()
 		{
@@ -56,6 +62,9 @@ namespace UnitTests.Services
 			result.Should().BeNull();
 		}
 
+		/// <summary>
+		/// Tests that GetAllOrderItemsAsync returns the full set of items.
+		/// </summary>
 		[Fact]
 		public async Task GetAllOrderItemsAsync_ReturnsAll()
 		{
@@ -78,6 +87,9 @@ namespace UnitTests.Services
 			result.Should().HaveCount(2);
 		}
 
+		/// <summary>
+		/// Tests that CreateOrderItemAsync adds a new item and saves changes.
+		/// </summary>
 		[Fact]
 		public async Task CreateOrderItemAsync_AddsAndSaves()
 		{
@@ -92,6 +104,9 @@ namespace UnitTests.Services
 			_dbContextMock.Verify(db => db.SaveChangesAsync(default), Times.Once);
 		}
 
+		/// <summary>
+		/// Tests that UpdateOrderItemAsync updates the item and calls SaveChanges.
+		/// </summary>
 		[Fact]
 		public async Task UpdateOrderItemAsync_UpdatesAndSaves()
 		{
@@ -106,6 +121,9 @@ namespace UnitTests.Services
 			_dbContextMock.Verify(db => db.SaveChangesAsync(default), Times.Once);
 		}
 
+		/// <summary>
+		/// Tests that DeleteOrderItemAsync removes the item if found, then saves.
+		/// </summary>
 		[Fact]
 		public async Task DeleteOrderItemAsync_WhenFound_DeletesAndSaves()
 		{
@@ -121,6 +139,9 @@ namespace UnitTests.Services
 			_dbContextMock.Verify(db => db.SaveChangesAsync(default), Times.Once);
 		}
 
+		/// <summary>
+		/// Tests that DeleteOrderItemAsync does nothing if the item is not found.
+		/// </summary>
 		[Fact]
 		public async Task DeleteOrderItemAsync_WhenNotFound_DoesNothing()
 		{

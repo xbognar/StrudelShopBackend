@@ -21,6 +21,9 @@ namespace UnitTests.Controllers
 			_controller = new ProductImageController(_productImageServiceMock.Object);
 		}
 
+		/// <summary>
+		/// Tests that GetAllProductImages returns an OkObjectResult with a list of product images.
+		/// </summary>
 		[Fact]
 		public async Task GetAllProductImages_ReturnsOkWithList()
 		{
@@ -41,6 +44,9 @@ namespace UnitTests.Controllers
 			returnedImages.Should().HaveCount(2);
 		}
 
+		/// <summary>
+		/// Tests that GetProductImageById returns OkObjectResult when the image is found.
+		/// </summary>
 		[Fact]
 		public async Task GetProductImageById_WhenFound_ReturnsOk()
 		{
@@ -57,6 +63,9 @@ namespace UnitTests.Controllers
 			returnedImage.ImageID.Should().Be(5);
 		}
 
+		/// <summary>
+		/// Tests that GetProductImageById returns NotFound when the image does not exist.
+		/// </summary>
 		[Fact]
 		public async Task GetProductImageById_WhenNotFound_ReturnsNotFound()
 		{
@@ -70,6 +79,9 @@ namespace UnitTests.Controllers
 			Assert.IsType<NotFoundResult>(result);
 		}
 
+		/// <summary>
+		/// Tests that CreateProductImage returns CreatedAtAction with the correct route values.
+		/// </summary>
 		[Fact]
 		public async Task CreateProductImage_ReturnsCreatedAtAction()
 		{
@@ -86,6 +98,9 @@ namespace UnitTests.Controllers
 			createdResult.Value.Should().Be(newImage);
 		}
 
+		/// <summary>
+		/// Tests that UpdateProductImage returns NoContent when the ID matches.
+		/// </summary>
 		[Fact]
 		public async Task UpdateProductImage_WhenIdMatches_ReturnsNoContent()
 		{
@@ -100,6 +115,9 @@ namespace UnitTests.Controllers
 			Assert.IsType<NoContentResult>(result);
 		}
 
+		/// <summary>
+		/// Tests that UpdateProductImage returns BadRequest when the route ID does not match the object’s ID.
+		/// </summary>
 		[Fact]
 		public async Task UpdateProductImage_WhenIdMismatch_ReturnsBadRequest()
 		{
@@ -113,6 +131,9 @@ namespace UnitTests.Controllers
 			Assert.IsType<BadRequestResult>(result);
 		}
 
+		/// <summary>
+		/// Tests that DeleteProductImage returns NoContent when deletion succeeds.
+		/// </summary>
 		[Fact]
 		public async Task DeleteProductImage_ReturnsNoContent()
 		{

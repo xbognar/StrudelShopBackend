@@ -39,6 +39,9 @@ namespace UnitTests.Services
 			_authService = new AuthenticationService(_dbContextMock.Object, _configMock.Object);
 		}
 
+		/// <summary>
+		/// Tests that authenticating with admin credentials returns an admin LoginResponseDTO.
+		/// </summary>
 		[Fact]
 		public async Task AuthenticateAsync_AdminCredentials_ReturnsAdminLoginResponse()
 		{
@@ -55,6 +58,9 @@ namespace UnitTests.Services
 			result.Token.Should().NotBeNullOrEmpty();
 		}
 
+		/// <summary>
+		/// Tests that authenticating with valid user credentials returns a user LoginResponseDTO.
+		/// </summary>
 		[Fact]
 		public async Task AuthenticateAsync_ValidUserCredentials_ReturnsUserLoginResponse()
 		{
@@ -69,7 +75,7 @@ namespace UnitTests.Services
 					UserID = 1,
 					Username = "testUser",
 					PasswordHash = "testPass",
-                    Role = "User",
+					Role = "User",
 					FirstName = "Test",
 					LastName = "User"
 				}
@@ -90,6 +96,9 @@ namespace UnitTests.Services
 			result.Token.Should().NotBeNullOrEmpty();
 		}
 
+		/// <summary>
+		/// Tests that authenticating with invalid credentials returns null.
+		/// </summary>
 		[Fact]
 		public async Task AuthenticateAsync_InvalidCredentials_ReturnsNull()
 		{
@@ -120,6 +129,9 @@ namespace UnitTests.Services
 			result.Should().BeNull();
 		}
 
+		/// <summary>
+		/// Tests that registering a new user successfully saves and returns true.
+		/// </summary>
 		[Fact]
 		public async Task RegisterUserAsync_SuccessfulSave_ReturnsTrue()
 		{
@@ -133,10 +145,13 @@ namespace UnitTests.Services
 			result.Should().BeTrue();
 			_dbContextMock.Verify(db => db.Users.AddAsync(newUser, default), Times.Once);
 			_dbContextMock.Verify(db => db.SaveChangesAsync(default), Times.Once);
-			newUser.PasswordHash.Should().Be("plainText");
+			newUser.PasswordHash.Should().Be("plainText"); // trivial hash from example
 			newUser.Role.Should().Be("User");
 		}
 
+		/// <summary>
+		/// Tests that if SaveChangesAsync returns 0, the registration fails (returns false).
+		/// </summary>
 		[Fact]
 		public async Task RegisterUserAsync_NoChangesSaved_ReturnsFalse()
 		{

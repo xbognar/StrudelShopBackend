@@ -21,6 +21,9 @@ namespace UnitTests.Controllers
 			_controller = new AuthenticationController(_authServiceMock.Object);
 		}
 
+		/// <summary>
+		/// Tests that a successful registration returns OK with the success message.
+		/// </summary>
 		[Fact]
 		public async Task Register_WhenRegistrationSucceeds_ReturnsOk()
 		{
@@ -38,6 +41,9 @@ namespace UnitTests.Controllers
 			actionResult.Value.Should().Be("Registration successful");
 		}
 
+		/// <summary>
+		/// Tests that a failed registration returns BadRequest with the fail message.
+		/// </summary>
 		[Fact]
 		public async Task Register_WhenRegistrationFails_ReturnsBadRequest()
 		{
@@ -55,6 +61,9 @@ namespace UnitTests.Controllers
 			actionResult.Value.Should().Be("Registration failed.");
 		}
 
+		/// <summary>
+		/// Tests that valid credentials during login return OK with a LoginResponseDTO.
+		/// </summary>
 		[Fact]
 		public async Task Login_ValidCredentials_ReturnsOkWithLoginResponse()
 		{
@@ -82,6 +91,9 @@ namespace UnitTests.Controllers
 			returnedResponse.Should().BeEquivalentTo(loginResponse);
 		}
 
+		/// <summary>
+		/// Tests that invalid credentials return Unauthorized with the correct error message.
+		/// </summary>
 		[Fact]
 		public async Task Login_InvalidCredentials_ReturnsUnauthorized()
 		{

@@ -22,6 +22,9 @@ namespace UnitTests.Controllers
 			_controller = new ProductController(_productServiceMock.Object);
 		}
 
+		/// <summary>
+		/// Tests that GetAllProducts returns Ok with a list of products.
+		/// </summary>
 		[Fact]
 		public async Task GetAllProducts_ReturnsOkWithList()
 		{
@@ -42,6 +45,9 @@ namespace UnitTests.Controllers
 			returnedList.Should().HaveCount(2);
 		}
 
+		/// <summary>
+		/// Tests that GetProductById returns Ok when the product exists.
+		/// </summary>
 		[Fact]
 		public async Task GetProductById_WhenFound_ReturnsOk()
 		{
@@ -58,6 +64,9 @@ namespace UnitTests.Controllers
 			returnedProduct.ProductID.Should().Be(10);
 		}
 
+		/// <summary>
+		/// Tests that GetProductById returns NotFound when the product does not exist.
+		/// </summary>
 		[Fact]
 		public async Task GetProductById_WhenNotFound_ReturnsNotFound()
 		{
@@ -71,6 +80,9 @@ namespace UnitTests.Controllers
 			Assert.IsType<NotFoundResult>(result.Result);
 		}
 
+		/// <summary>
+		/// Tests that CreateProduct returns CreatedAtAction with correct route values.
+		/// </summary>
 		[Fact]
 		public async Task CreateProduct_ReturnsCreatedAtAction()
 		{
@@ -87,6 +99,9 @@ namespace UnitTests.Controllers
 			createdResult.Value.Should().Be(newProduct);
 		}
 
+		/// <summary>
+		/// Tests that UpdateProduct returns NoContent when the IDs match and the update is successful.
+		/// </summary>
 		[Fact]
 		public async Task UpdateProduct_WhenIdMatches_ReturnsNoContent()
 		{
@@ -101,6 +116,9 @@ namespace UnitTests.Controllers
 			Assert.IsType<NoContentResult>(result);
 		}
 
+		/// <summary>
+		/// Tests that UpdateProduct returns BadRequest when the path ID does not match the product's ID.
+		/// </summary>
 		[Fact]
 		public async Task UpdateProduct_WhenIdMismatch_ReturnsBadRequest()
 		{
@@ -114,6 +132,9 @@ namespace UnitTests.Controllers
 			Assert.IsType<BadRequestResult>(result);
 		}
 
+		/// <summary>
+		/// Tests that DeleteProduct returns NoContent when deletion succeeds.
+		/// </summary>
 		[Fact]
 		public async Task DeleteProduct_ReturnsNoContent()
 		{
@@ -127,6 +148,9 @@ namespace UnitTests.Controllers
 			Assert.IsType<NoContentResult>(result);
 		}
 
+		/// <summary>
+		/// Tests that GetTopSellingProducts returns Ok with a list of TopSellingProductDTO.
+		/// </summary>
 		[Fact]
 		public async Task GetTopSellingProducts_ReturnsOk()
 		{
@@ -147,6 +171,9 @@ namespace UnitTests.Controllers
 			returnedList.Should().HaveCount(2);
 		}
 
+		/// <summary>
+		/// Tests that GetProductOverview returns Ok with a list of ProductOverviewDTO.
+		/// </summary>
 		[Fact]
 		public async Task GetProductOverview_ReturnsOk()
 		{

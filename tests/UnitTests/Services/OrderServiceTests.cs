@@ -30,6 +30,9 @@ namespace UnitTests.Services
 			_service = new OrderService(_dbContextMock.Object);
 		}
 
+		/// <summary>
+		/// Tests that GetOrderByIdAsync returns the order if it is found.
+		/// </summary>
 		[Fact]
 		public async Task GetOrderByIdAsync_WhenFound_ReturnsOrder()
 		{
@@ -50,6 +53,9 @@ namespace UnitTests.Services
 			result.OrderID.Should().Be(1);
 		}
 
+		/// <summary>
+		/// Tests that GetOrderByIdAsync returns null if the order is not found.
+		/// </summary>
 		[Fact]
 		public async Task GetOrderByIdAsync_WhenNotFound_ReturnsNull()
 		{
@@ -68,6 +74,9 @@ namespace UnitTests.Services
 			result.Should().BeNull();
 		}
 
+		/// <summary>
+		/// Tests that GetAllOrdersAsync returns the expected list of orders.
+		/// </summary>
 		[Fact]
 		public async Task GetAllOrdersAsync_ReturnsOrders()
 		{
@@ -90,6 +99,9 @@ namespace UnitTests.Services
 			result.Should().HaveCount(2);
 		}
 
+		/// <summary>
+		/// Tests that CreateOrderAsync adds and saves a new order.
+		/// </summary>
 		[Fact]
 		public async Task CreateOrderAsync_AddsAndSaves()
 		{
@@ -104,6 +116,9 @@ namespace UnitTests.Services
 			_dbContextMock.Verify(db => db.SaveChangesAsync(default), Times.Once);
 		}
 
+		/// <summary>
+		/// Tests that UpdateOrderAsync updates the order and saves changes.
+		/// </summary>
 		[Fact]
 		public async Task UpdateOrderAsync_UpdatesAndSaves()
 		{
@@ -118,6 +133,9 @@ namespace UnitTests.Services
 			_dbContextMock.Verify(db => db.SaveChangesAsync(default), Times.Once);
 		}
 
+		/// <summary>
+		/// Tests that DeleteOrderAsync removes the order if found, then saves.
+		/// </summary>
 		[Fact]
 		public async Task DeleteOrderAsync_WhenFound_DeletesAndSaves()
 		{
@@ -133,6 +151,9 @@ namespace UnitTests.Services
 			_dbContextMock.Verify(db => db.SaveChangesAsync(default), Times.Once);
 		}
 
+		/// <summary>
+		/// Tests that DeleteOrderAsync does nothing if the order is not found.
+		/// </summary>
 		[Fact]
 		public async Task DeleteOrderAsync_WhenNotFound_DoesNothing()
 		{
@@ -147,6 +168,9 @@ namespace UnitTests.Services
 			_dbContextMock.Verify(db => db.SaveChangesAsync(default), Times.Never);
 		}
 
+		/// <summary>
+		/// Tests that GetOrderHistoryAsync returns the orders belonging to a specified user.
+		/// </summary>
 		[Fact]
 		public async Task GetOrderHistoryAsync_ReturnsMatchingOrders()
 		{
@@ -174,6 +198,9 @@ namespace UnitTests.Services
 			result.Should().HaveCount(2);
 		}
 
+		/// <summary>
+		/// Tests that GetOrderDetailsAsync returns an OrderDetailsDTO when the order is found.
+		/// </summary>
 		[Fact]
 		public async Task GetOrderDetailsAsync_WhenOrderFound_ReturnsDetails()
 		{
@@ -207,6 +234,9 @@ namespace UnitTests.Services
 			result.OrderItems.Should().HaveCount(1);
 		}
 
+		/// <summary>
+		/// Tests that GetOrderDetailsAsync returns null when the specified order is not found.
+		/// </summary>
 		[Fact]
 		public async Task GetOrderDetailsAsync_WhenOrderNotFound_ReturnsNull()
 		{
@@ -226,6 +256,9 @@ namespace UnitTests.Services
 			result.Should().BeNull();
 		}
 
+		/// <summary>
+		/// Tests that GetCustomerOrderSummariesAsync returns a list of CustomerOrderSummaryDTO.
+		/// </summary>
 		[Fact]
 		public async Task GetCustomerOrderSummariesAsync_ReturnsSummaries()
 		{

@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Xunit;
@@ -30,6 +29,9 @@ namespace UnitTests.Services
 			_service = new ProductService(_dbContextMock.Object);
 		}
 
+		/// <summary>
+		/// Tests that GetProductByIdAsync returns the product if it is found.
+		/// </summary>
 		[Fact]
 		public async Task GetProductByIdAsync_WhenFound_ReturnsProduct()
 		{
@@ -50,6 +52,9 @@ namespace UnitTests.Services
 			result.Name.Should().Be("Apple Strudel");
 		}
 
+		/// <summary>
+		/// Tests that GetProductByIdAsync returns null if the product is not found.
+		/// </summary>
 		[Fact]
 		public async Task GetProductByIdAsync_WhenNotFound_ReturnsNull()
 		{
@@ -67,6 +72,9 @@ namespace UnitTests.Services
 			result.Should().BeNull();
 		}
 
+		/// <summary>
+		/// Tests that GetAllProductsAsync returns the expected list of products.
+		/// </summary>
 		[Fact]
 		public async Task GetAllProductsAsync_ReturnsProducts()
 		{
@@ -89,6 +97,9 @@ namespace UnitTests.Services
 			result.Should().HaveCount(2);
 		}
 
+		/// <summary>
+		/// Tests that CreateProductAsync adds and saves a new product.
+		/// </summary>
 		[Fact]
 		public async Task CreateProductAsync_AddsAndSaves()
 		{
@@ -103,6 +114,9 @@ namespace UnitTests.Services
 			_dbContextMock.Verify(db => db.SaveChangesAsync(default), Times.Once);
 		}
 
+		/// <summary>
+		/// Tests that UpdateProductAsync updates the product and saves changes.
+		/// </summary>
 		[Fact]
 		public async Task UpdateProductAsync_UpdatesAndSaves()
 		{
@@ -117,6 +131,9 @@ namespace UnitTests.Services
 			_dbContextMock.Verify(db => db.SaveChangesAsync(default), Times.Once);
 		}
 
+		/// <summary>
+		/// Tests that DeleteProductAsync removes the product if it is found, then saves.
+		/// </summary>
 		[Fact]
 		public async Task DeleteProductAsync_WhenFound_DeletesAndSaves()
 		{
@@ -132,6 +149,9 @@ namespace UnitTests.Services
 			_dbContextMock.Verify(db => db.SaveChangesAsync(default), Times.Once);
 		}
 
+		/// <summary>
+		/// Tests that DeleteProductAsync does nothing if the product is not found.
+		/// </summary>
 		[Fact]
 		public async Task DeleteProductAsync_WhenNotFound_DoesNothing()
 		{
@@ -146,11 +166,13 @@ namespace UnitTests.Services
 			_dbContextMock.Verify(db => db.SaveChangesAsync(default), Times.Never);
 		}
 
+		/// <summary>
+		/// Tests that GetTopSellingProductsAsync returns the correct groupings and totals.
+		/// </summary>
 		[Fact]
 		public async Task GetTopSellingProductsAsync_ReturnsCorrectGroupings()
 		{
 			// Arrange
-			// Mock the OrderItems
 			var mockOrderItems = new List<OrderItem>
 			{
 				new OrderItem { OrderID = 1, ProductID = 1, Quantity = 2 },
@@ -163,10 +185,8 @@ namespace UnitTests.Services
 			mockOrderItemDbSet.As<IQueryable<OrderItem>>().Setup(m => m.Expression).Returns(mockOrderItems.Expression);
 			mockOrderItemDbSet.As<IQueryable<OrderItem>>().Setup(m => m.ElementType).Returns(mockOrderItems.ElementType);
 			mockOrderItemDbSet.As<IQueryable<OrderItem>>().Setup(m => m.GetEnumerator()).Returns(mockOrderItems.GetEnumerator());
-
 			_dbContextMock.Setup(db => db.OrderItems).Returns(mockOrderItemDbSet.Object);
 
-			// Mock the Products
 			var mockProducts = new List<Product>
 			{
 				new Product { ProductID = 1, Name = "Apple Strudel" },
@@ -178,7 +198,6 @@ namespace UnitTests.Services
 			mockProductDbSet.As<IQueryable<Product>>().Setup(m => m.Expression).Returns(mockProducts.Expression);
 			mockProductDbSet.As<IQueryable<Product>>().Setup(m => m.ElementType).Returns(mockProducts.ElementType);
 			mockProductDbSet.As<IQueryable<Product>>().Setup(m => m.GetEnumerator()).Returns(mockProducts.GetEnumerator());
-
 			_dbContextMock.Setup(db => db.Products).Returns(mockProductDbSet.Object);
 
 			// Act
@@ -188,11 +207,14 @@ namespace UnitTests.Services
 			result.Should().HaveCount(2);
 
 			var apple = result.First(r => r.Name == "Apple Strudel");
-			apple.TotalSold.Should().Be(6);
+			apple.TotalSold.Should().Be(6); // 2 + 4
 			var cherry = result.First(r => r.Name == "Cherry Strudel");
 			cherry.TotalSold.Should().Be(3);
 		}
 
+		/// <summary>
+		/// Tests that GetProductOverviewAsync returns an overview including stock counts.
+		/// </summary>
 		[Fact]
 		public async Task GetProductOverviewAsync_ReturnsOverviewData()
 		{

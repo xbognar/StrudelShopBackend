@@ -28,6 +28,9 @@ namespace UnitTests.Services
 			_service = new ProductImageService(_dbContextMock.Object);
 		}
 
+		/// <summary>
+		/// Tests that GetProductImageByIdAsync returns the image when found.
+		/// </summary>
 		[Fact]
 		public async Task GetProductImageByIdAsync_WhenFound_ReturnsImage()
 		{
@@ -43,6 +46,9 @@ namespace UnitTests.Services
 			result.ImageID.Should().Be(1);
 		}
 
+		/// <summary>
+		/// Tests that GetProductImageByIdAsync returns null when the image is not found.
+		/// </summary>
 		[Fact]
 		public async Task GetProductImageByIdAsync_WhenNotFound_ReturnsNull()
 		{
@@ -56,6 +62,9 @@ namespace UnitTests.Services
 			result.Should().BeNull();
 		}
 
+		/// <summary>
+		/// Tests that GetAllProductImagesAsync returns all images in the DbSet.
+		/// </summary>
 		[Fact]
 		public async Task GetAllProductImagesAsync_ReturnsAllImages()
 		{
@@ -78,6 +87,9 @@ namespace UnitTests.Services
 			result.Should().HaveCount(2);
 		}
 
+		/// <summary>
+		/// Tests that CreateProductImageAsync adds and saves a new product image.
+		/// </summary>
 		[Fact]
 		public async Task CreateProductImageAsync_AddsAndSaves()
 		{
@@ -92,6 +104,9 @@ namespace UnitTests.Services
 			_dbContextMock.Verify(db => db.SaveChangesAsync(default), Times.Once);
 		}
 
+		/// <summary>
+		/// Tests that UpdateProductImageAsync updates the image and saves.
+		/// </summary>
 		[Fact]
 		public async Task UpdateProductImageAsync_UpdatesAndSaves()
 		{
@@ -106,6 +121,9 @@ namespace UnitTests.Services
 			_dbContextMock.Verify(db => db.SaveChangesAsync(default), Times.Once);
 		}
 
+		/// <summary>
+		/// Tests that DeleteProductImageAsync removes and saves the image if found.
+		/// </summary>
 		[Fact]
 		public async Task DeleteProductImageAsync_WhenFound_DeletesAndSaves()
 		{
@@ -121,6 +139,9 @@ namespace UnitTests.Services
 			_dbContextMock.Verify(db => db.SaveChangesAsync(default), Times.Once);
 		}
 
+		/// <summary>
+		/// Tests that DeleteProductImageAsync does nothing if the image is not found.
+		/// </summary>
 		[Fact]
 		public async Task DeleteProductImageAsync_WhenNotFound_DoesNothing()
 		{
