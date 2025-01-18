@@ -6,11 +6,12 @@ if "%ERRORLEVEL%"=="0" (
     echo Docker Desktop is already running.
 ) else (
     echo Starting Docker Desktop...
-    powershell -Command "Start-Process 'C:\Program Files\Docker\Docker\Docker Desktop.exe' -WindowStyle Minimized"
+    REM Use PowerShell to start Docker Desktop minimized
+    powershell -Command "Start-Process 'Docker Desktop.exe' -WindowStyle Minimized"
     echo Waiting for Docker Desktop to start...
 )
 
-REM Verify Docker is ready and retry
+REM Check if Docker is ready, retry if necessary
 :check_docker_ready
 docker info >nul 2>&1
 if errorlevel 1 (
@@ -20,10 +21,11 @@ if errorlevel 1 (
 )
 
 REM Navigate to project directory
-cd C:\Users\matth\JobPractice\StrudelShopBackend
+cd /d "path\to\your\project"
 
 REM Start Docker services
 echo Starting Docker services...
 docker-compose up --build -d
 
-echo Application successfully started.
+echo Application has been successfully started.
+
