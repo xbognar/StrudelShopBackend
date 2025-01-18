@@ -172,10 +172,49 @@ To run the application locally, follow these steps:
 
 - `POST /api/authentication/login`: Authenticates a user and returns a JWT token.
 
-## Entity Framework Core Integration
+## Testing
 
-Entity Framework Core is used extensively across the DataAccess project to handle database interactions, replacing the need for manual SQL queries by enabling strongly-typed, LINQ-based data manipulation. The `ApplicationDbContext` class represents the database context, mapping models to SQL tables.
+The StrudelShop Backend is backed by a thorough **testing strategy** that includes **Unit Tests** and **Integration Tests**:
 
-## Conclusion
+1. **Unit Tests**  
+   - **Tools & Frameworks**: 
+     - [xUnit](https://xunit.net/) – Test framework  
+     - [Moq](https://github.com/moq/moq4) – Mocking library  
+     - [FluentAssertions](https://fluentassertions.com/) – Expressive, readable assertions  
 
-StrudelShop Backend provides a robust, scalable solution for e-commerce applications, leveraging modern technologies and best practices. With its clear separation of concerns, efficient data access using Entity Framework Core, and a well-defined database schema, it is poised for future growth and enhancements.
+   - **Scope**:
+     - **Services** (e.g., `UserService`, `ProductService`, etc.) to verify logic in isolation, mocking out `DbContext` and data dependencies.
+     - **Controllers** (e.g., `UserController`, `OrderController`) to confirm each endpoint’s return type (`Ok`, `NotFound`, etc.) and how they interact with service interfaces.
+
+   - **Key Benefits**:
+     - Fast feedback on core logic  
+     - Ensures controllers return correct HTTP responses  
+     - Verifies service-layer methods handle data consistently  
+
+2. **Integration Tests**  
+   - **Tools & Frameworks**:
+     - [Microsoft.AspNetCore.Mvc.Testing](https://learn.microsoft.com/en-us/dotnet/core/testing/integration-testing) – Spins up an **in-memory** ASP.NET Core test server  
+     - [EF Core InMemory](https://learn.microsoft.com/en-us/ef/core/providers/in-memory) – Replaces the SQL Server with an in-memory DB for testing  
+
+   - **Scope**:
+     - Tests full end-to-end, from the **HTTP request** through **controllers**, **services**, **entity framework layer**, and into an **in-memory** database.
+     - Verifies authentication (JWT-based) and role-based endpoints.
+
+   - **Approach**:
+     1. A **`WebApplicationFactory<Program>`** loads the real `Program.cs` pipeline.  
+     2. The **DbContext** is overridden to use **InMemoryDatabase**.  
+     3. **Seed data** is inserted automatically for realistic test scenarios.  
+     4. **`HttpClient`** calls the real endpoints (`/api/product`, `/api/order`, etc.).  
+     5. Responses are validated for correct status codes, JSON payloads, and DB changes.
+
+   - **Key Benefits**:
+     - Confidence that the entire ASP.NET Core pipeline (routing, model binding, controllers, data access) behaves correctly.
+     - Catches configuration or dependency injection issues.
+     - Ensures authentication/authorization is enforced.
+
+**Test Project Structure**  
+The repository contains two distinct test projects in the `tests/` directory:
+- **`UnitTests/`** – Contains separate folders for Controllers and Services, each with xUnit tests that mock dependencies.  
+- **`IntegrationTests/`** – Contains test fixtures, seed data helpers, and full controller-level tests that run against an in-memory test server.
+
+By combining **unit** and **integration** testing, StrudelShop Backend maintains high reliability, quickly identifies regressions, and ensures the codebase is ready for production deployment.
