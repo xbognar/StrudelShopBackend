@@ -75,7 +75,33 @@ StrudelShopBackend/
 │       ├── appsettings.Development.json
 │       ├── Dockerfile
 │       └── Program.cs
-|
+├── tests/
+│   ├── IntegrationTests/
+│   │   ├── Controllers/
+│   │   │   ├── AuthenticationControllerIntegrationTests.cs
+│   │   │   ├── OrderControllerIntegrationTests.cs
+│   │   │   ├── OrderItemControllerIntegrationTests.cs
+│   │   │   ├── ProductControllerIntegrationTests.cs
+│   │   │   ├── ProductImageControllerIntegrationTests.cs
+│   │   │   └── UserControllerIntegrationTests.cs
+│   │   ├── Dependencies/
+│   │   │   ├── IntegrationTestFixture.cs
+│   │   │   ├── TestUtilities.cs
+│   │   │   └── SeedDataHelper.cs
+│   │   └── IntegrationTests.csproj
+│   └── UnitTests/
+│       ├── Services/
+│       │   ├── AuthenticationServiceTests.cs
+│       │   ├── OrderServiceTests.cs
+│       │   ├── ProductServiceTests.cs
+│       │   ├── UserServiceTests.cs
+│       ├── Controllers/
+│       │   ├── AuthenticationControllerTests.cs
+│       │   ├── OrderControllerTests.cs
+│       │   ├── ProductControllerTests.cs
+│       │   └── UserControllerTests.cs
+│       └── UnitTests.csproj
+│
 ├── StartBE.bat
 ├── StopBE.bat
 └── docker-compose.yaml
