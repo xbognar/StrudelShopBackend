@@ -1,9 +1,9 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Xunit;
 using FluentAssertions;
-using Moq;
 using Microsoft.EntityFrameworkCore;
 using DataAccess.Services;
 using StrudelShop.DataAccess.DataAccess;
@@ -11,21 +11,51 @@ using DataAccess.Models;
 
 namespace UnitTests.Services
 {
-	public class ProductImageServiceTests
+	public class ProductImageServiceTests : IDisposable
 	{
-		private readonly Mock<ApplicationDbContext> _dbContextMock;
-		private readonly Mock<DbSet<ProductImage>> _productImageDbSetMock;
+		private readonly ApplicationDbContext _dbContext;
 		private readonly ProductImageService _service;
 
 		public ProductImageServiceTests()
 		{
-			var options = new DbContextOptions<ApplicationDbContext>();
-			_dbContextMock = new Mock<ApplicationDbContext>(options);
+			// Setup In-Memory Database
+			var options = new DbContextOptionsBuilder<ApplicationDbContext>()
+				.UseInMemoryDatabase(databaseName: $"ProductImageTestDb_{Guid.NewGuid()}")
+				.Options;
 
-			_productImageDbSetMock = new Mock<DbSet<ProductImage>>();
-			_dbContextMock.Setup(db => db.ProductImages).Returns(_productImageDbSetMock.Object);
+			_dbContext = new ApplicationDbContext(options);
 
-			_service = new ProductImageService(_dbContextMock.Object);
+			// Seed initial data with all required properties
+			var product1 = new Product
+			{
+				ProductID = 10,
+				Name = "Apple Strudel",
+				Description = "Delicious apple-filled pastry.",
+				Price = 10.99m,
+				ImageURL = "apple_main.jpg"
+			};
+			var product2 = new Product
+			{
+				ProductID = 15,
+				Name = "Cherry Strudel",
+				Description = "Tasty cherry-filled pastry.",
+				Price = 12.99m,
+				ImageURL = "cherry_main.jpg"
+			};
+
+			_dbContext.Products.AddRange(product1, product2);
+
+			var productImages = new List<ProductImage>
+			{
+				new ProductImage { ImageID = 1, ProductID = 10, ImageURL = "apple1.jpg" },
+				new ProductImage { ImageID = 2, ProductID = 10, ImageURL = "apple2.jpg" },
+				new ProductImage { ImageID = 3, ProductID = 15, ImageURL = "cherry1.jpg" }
+			};
+
+			_dbContext.ProductImages.AddRange(productImages);
+			_dbContext.SaveChanges();
+
+			_service = new ProductImageService(_dbContext);
 		}
 
 		/// <summary>
@@ -35,15 +65,16 @@ namespace UnitTests.Services
 		public async Task GetProductImageByIdAsync_WhenFound_ReturnsImage()
 		{
 			// Arrange
-			var testImage = new ProductImage { ImageID = 1, ProductID = 10 };
-			_dbContextMock.Setup(db => db.ProductImages.FindAsync(1)).ReturnsAsync(testImage);
+			var testImageId = 1;
 
 			// Act
-			var result = await _service.GetProductImageByIdAsync(1);
+			var result = await _service.GetProductImageByIdAsync(testImageId);
 
 			// Assert
 			result.Should().NotBeNull();
-			result.ImageID.Should().Be(1);
+			result.ImageID.Should().Be(testImageId);
+			result.ProductID.Should().Be(10);
+			result.ImageURL.Should().Be("apple1.jpg");
 		}
 
 		/// <summary>
@@ -53,10 +84,10 @@ namespace UnitTests.Services
 		public async Task GetProductImageByIdAsync_WhenNotFound_ReturnsNull()
 		{
 			// Arrange
-			_dbContextMock.Setup(db => db.ProductImages.FindAsync(999)).ReturnsAsync((ProductImage)null);
+			var testImageId = 999;
 
 			// Act
-			var result = await _service.GetProductImageByIdAsync(999);
+			var result = await _service.GetProductImageByIdAsync(testImageId);
 
 			// Assert
 			result.Should().BeNull();
@@ -68,23 +99,14 @@ namespace UnitTests.Services
 		[Fact]
 		public async Task GetAllProductImagesAsync_ReturnsAllImages()
 		{
-			// Arrange
-			var imagesData = new List<ProductImage>
-			{
-				new ProductImage { ImageID = 1, ProductID = 10 },
-				new ProductImage { ImageID = 2, ProductID = 15 }
-			}.AsQueryable();
-
-			_productImageDbSetMock.As<IQueryable<ProductImage>>().Setup(m => m.Provider).Returns(imagesData.Provider);
-			_productImageDbSetMock.As<IQueryable<ProductImage>>().Setup(m => m.Expression).Returns(imagesData.Expression);
-			_productImageDbSetMock.As<IQueryable<ProductImage>>().Setup(m => m.ElementType).Returns(imagesData.ElementType);
-			_productImageDbSetMock.As<IQueryable<ProductImage>>().Setup(m => m.GetEnumerator()).Returns(imagesData.GetEnumerator());
-
 			// Act
 			var result = await _service.GetAllProductImagesAsync();
 
 			// Assert
-			result.Should().HaveCount(2);
+			result.Should().HaveCount(3);
+			result.Should().Contain(pi => pi.ImageID == 1);
+			result.Should().Contain(pi => pi.ImageID == 2);
+			result.Should().Contain(pi => pi.ImageID == 3);
 		}
 
 		/// <summary>
@@ -94,31 +116,34 @@ namespace UnitTests.Services
 		public async Task CreateProductImageAsync_AddsAndSaves()
 		{
 			// Arrange
-			var newImage = new ProductImage { ImageID = 3, ProductID = 20 };
+			var newImage = new ProductImage { ImageID = 4, ProductID = 15, ImageURL = "cherry2.jpg" };
 
 			// Act
 			await _service.CreateProductImageAsync(newImage);
 
 			// Assert
-			_dbContextMock.Verify(db => db.ProductImages.AddAsync(newImage, default), Times.Once);
-			_dbContextMock.Verify(db => db.SaveChangesAsync(default), Times.Once);
+			var createdImage = await _dbContext.ProductImages.FindAsync(4);
+			createdImage.Should().NotBeNull();
+			createdImage.ProductID.Should().Be(15);
+			createdImage.ImageURL.Should().Be("cherry2.jpg");
 		}
 
 		/// <summary>
-		/// Tests that UpdateProductImageAsync updates the image and saves.
+		/// Tests that UpdateProductImageAsync updates the image and saves changes.
 		/// </summary>
 		[Fact]
 		public async Task UpdateProductImageAsync_UpdatesAndSaves()
 		{
 			// Arrange
-			var existingImage = new ProductImage { ImageID = 5 };
+			var existingImage = await _dbContext.ProductImages.FindAsync(1);
+			existingImage.ImageURL = "updated_apple1.jpg";
 
 			// Act
 			await _service.UpdateProductImageAsync(existingImage);
 
 			// Assert
-			_dbContextMock.Verify(db => db.ProductImages.Update(existingImage), Times.Once);
-			_dbContextMock.Verify(db => db.SaveChangesAsync(default), Times.Once);
+			var updatedImage = await _dbContext.ProductImages.FindAsync(1);
+			updatedImage.ImageURL.Should().Be("updated_apple1.jpg");
 		}
 
 		/// <summary>
@@ -128,15 +153,14 @@ namespace UnitTests.Services
 		public async Task DeleteProductImageAsync_WhenFound_DeletesAndSaves()
 		{
 			// Arrange
-			var existingImage = new ProductImage { ImageID = 10 };
-			_dbContextMock.Setup(db => db.ProductImages.FindAsync(10)).ReturnsAsync(existingImage);
+			var existingImage = await _dbContext.ProductImages.FindAsync(2);
 
 			// Act
-			await _service.DeleteProductImageAsync(10);
+			await _service.DeleteProductImageAsync(2);
 
 			// Assert
-			_dbContextMock.Verify(db => db.ProductImages.Remove(existingImage), Times.Once);
-			_dbContextMock.Verify(db => db.SaveChangesAsync(default), Times.Once);
+			var deletedImage = await _dbContext.ProductImages.FindAsync(2);
+			deletedImage.Should().BeNull();
 		}
 
 		/// <summary>
@@ -146,14 +170,20 @@ namespace UnitTests.Services
 		public async Task DeleteProductImageAsync_WhenNotFound_DoesNothing()
 		{
 			// Arrange
-			_dbContextMock.Setup(db => db.ProductImages.FindAsync(999)).ReturnsAsync((ProductImage)null);
+			var nonExistentImageId = 999;
 
 			// Act
-			await _service.DeleteProductImageAsync(999);
+			await _service.DeleteProductImageAsync(nonExistentImageId);
 
 			// Assert
-			_dbContextMock.Verify(db => db.ProductImages.Remove(It.IsAny<ProductImage>()), Times.Never);
-			_dbContextMock.Verify(db => db.SaveChangesAsync(default), Times.Never);
+			var image = await _dbContext.ProductImages.FindAsync(nonExistentImageId);
+			image.Should().BeNull();
+			_dbContext.ProductImages.Count().Should().Be(3);
+		}
+
+		public void Dispose()
+		{
+			_dbContext.Dispose();
 		}
 	}
 }

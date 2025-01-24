@@ -22,7 +22,7 @@ namespace UnitTests.Controllers
 		}
 
 		/// <summary>
-		/// Tests that GetAllOrderItems returns Ok with a list of OrderItem objects.
+		/// Tests that GetAllOrderItems returns OkObjectResult with a list of OrderItem objects.
 		/// </summary>
 		[Fact]
 		public async Task GetAllOrderItems_ReturnsOkWithList()
@@ -35,13 +35,13 @@ namespace UnitTests.Controllers
 			var result = await _controller.GetAllOrderItems();
 
 			// Assert
-			var okResult = Assert.IsType<OkObjectResult>(result);
+			var okResult = Assert.IsType<OkObjectResult>(result.Result);
 			var returnedItems = Assert.IsType<List<OrderItem>>(okResult.Value);
 			returnedItems.Should().HaveCount(2);
 		}
 
 		/// <summary>
-		/// Tests that GetOrderItemById returns Ok with an OrderItem when found.
+		/// Tests that GetOrderItemById returns OkObjectResult with an OrderItem when found.
 		/// </summary>
 		[Fact]
 		public async Task GetOrderItemById_WhenFound_ReturnsOk()
@@ -54,7 +54,7 @@ namespace UnitTests.Controllers
 			var result = await _controller.GetOrderItemById(10);
 
 			// Assert
-			var okResult = Assert.IsType<OkObjectResult>(result);
+			var okResult = Assert.IsType<OkObjectResult>(result.Result);
 			var returnedItem = Assert.IsType<OrderItem>(okResult.Value);
 			returnedItem.OrderItemID.Should().Be(10);
 		}
@@ -72,7 +72,7 @@ namespace UnitTests.Controllers
 			var result = await _controller.GetOrderItemById(999);
 
 			// Assert
-			Assert.IsType<NotFoundResult>(result);
+			Assert.IsType<NotFoundResult>(result.Result);
 		}
 
 		/// <summary>

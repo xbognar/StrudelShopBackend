@@ -1,9 +1,9 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Xunit;
 using FluentAssertions;
-using Moq;
 using Microsoft.EntityFrameworkCore;
 using DataAccess.Services;
 using StrudelShop.DataAccess.DataAccess;
@@ -11,24 +11,50 @@ using DataAccess.Models;
 
 namespace UnitTests.Services
 {
-	public class UserServiceTests
+	public class UserServiceTests : IDisposable
 	{
-		private readonly Mock<ApplicationDbContext> _dbContextMock;
-		private readonly Mock<DbSet<User>> _userDbSetMock;
+		private readonly ApplicationDbContext _dbContext;
 		private readonly UserService _userService;
 
 		public UserServiceTests()
 		{
-			// Create an in-memory DbContextOptions just to pass into the mock constructor
-			var options = new DbContextOptions<ApplicationDbContext>();
-			_dbContextMock = new Mock<ApplicationDbContext>(options);
+			// Setup In-Memory Database
+			var options = new DbContextOptionsBuilder<ApplicationDbContext>()
+				.UseInMemoryDatabase(databaseName: $"UserTestDb_{Guid.NewGuid()}")
+				.Options;
 
-			// Mock the DbSet<User> so we can arrange data
-			_userDbSetMock = new Mock<DbSet<User>>();
-			_dbContextMock.Setup(db => db.Users).Returns(_userDbSetMock.Object);
+			_dbContext = new ApplicationDbContext(options);
 
-			// Instantiate the UserService with the mocked context
-			_userService = new UserService(_dbContextMock.Object);
+			// Seed initial data
+			var user1 = new User
+			{
+				UserID = 1,
+				Username = "Alice",
+				PasswordHash = "alicePass",
+				Role = "User",
+				FirstName = "Alice",
+				LastName = "Wonderland",
+				Email = "alice@strudelshop.com",
+				PhoneNumber = "1112223333",
+				Address = "123 Apple St"
+			};
+			var user2 = new User
+			{
+				UserID = 2,
+				Username = "Bob",
+				PasswordHash = "bobPass",
+				Role = "User",
+				FirstName = "Bob",
+				LastName = "Builder",
+				Email = "bob@strudelshop.com",
+				PhoneNumber = "4445556666",
+				Address = "456 Banana Ave"
+			};
+
+			_dbContext.Users.AddRange(user1, user2);
+			_dbContext.SaveChanges();
+
+			_userService = new UserService(_dbContext);
 		}
 
 		/// <summary>
@@ -38,18 +64,21 @@ namespace UnitTests.Services
 		public async Task GetUserByIdAsync_WhenUserExists_ReturnsUser()
 		{
 			// Arrange
-			var testUser = new User { UserID = 1, Username = "Alice" };
-			_dbContextMock
-				.Setup(db => db.Users.FindAsync(1))
-				.ReturnsAsync(testUser);
+			var userId = 1;
 
 			// Act
-			var result = await _userService.GetUserByIdAsync(1);
+			var result = await _userService.GetUserByIdAsync(userId);
 
 			// Assert
 			result.Should().NotBeNull();
-			result.UserID.Should().Be(1);
+			result.UserID.Should().Be(userId);
 			result.Username.Should().Be("Alice");
+			result.FirstName.Should().Be("Alice");
+			result.LastName.Should().Be("Wonderland");
+			result.Email.Should().Be("alice@strudelshop.com");
+			result.PhoneNumber.Should().Be("1112223333");
+			result.Address.Should().Be("123 Apple St");
+			result.Role.Should().Be("User");
 		}
 
 		/// <summary>
@@ -59,12 +88,10 @@ namespace UnitTests.Services
 		public async Task GetUserByIdAsync_WhenUserNotFound_ReturnsNull()
 		{
 			// Arrange
-			_dbContextMock
-				.Setup(db => db.Users.FindAsync(999))
-				.ReturnsAsync((User)null);
+			var userId = 999;
 
 			// Act
-			var result = await _userService.GetUserByIdAsync(999);
+			var result = await _userService.GetUserByIdAsync(userId);
 
 			// Assert
 			result.Should().BeNull();
@@ -76,24 +103,13 @@ namespace UnitTests.Services
 		[Fact]
 		public async Task GetAllUsersAsync_ReturnsAllUsers()
 		{
-			// Arrange
-			var testUsers = new List<User>
-			{
-				new User { UserID = 1, Username = "Alice" },
-				new User { UserID = 2, Username = "Bob" }
-			}.AsQueryable();
-
-			// Setup the IQueryable behavior
-			_userDbSetMock.As<IQueryable<User>>().Setup(m => m.Provider).Returns(testUsers.Provider);
-			_userDbSetMock.As<IQueryable<User>>().Setup(m => m.Expression).Returns(testUsers.Expression);
-			_userDbSetMock.As<IQueryable<User>>().Setup(m => m.ElementType).Returns(testUsers.ElementType);
-			_userDbSetMock.As<IQueryable<User>>().Setup(m => m.GetEnumerator()).Returns(testUsers.GetEnumerator());
-
 			// Act
 			var result = await _userService.GetAllUsersAsync();
 
 			// Assert
 			result.Should().HaveCount(2);
+			result.Should().Contain(u => u.UserID == 1 && u.Username == "Alice");
+			result.Should().Contain(u => u.UserID == 2 && u.Username == "Bob");
 		}
 
 		/// <summary>
@@ -103,14 +119,32 @@ namespace UnitTests.Services
 		public async Task CreateUserAsync_SavesUserAndCallsSaveChanges()
 		{
 			// Arrange
-			var newUser = new User { UserID = 3, Username = "Charlie" };
+			var newUser = new User
+			{
+				UserID = 3,
+				Username = "Charlie",
+				PasswordHash = "charliePass",
+				Role = "User",
+				FirstName = "Charlie",
+				LastName = "Chaplin",
+				Email = "charlie@strudelshop.com",
+				PhoneNumber = "7778889999",
+				Address = "789 Cherry Blvd"
+			};
 
 			// Act
 			await _userService.CreateUserAsync(newUser);
 
 			// Assert
-			_dbContextMock.Verify(db => db.Users.AddAsync(newUser, default), Times.Once);
-			_dbContextMock.Verify(db => db.SaveChangesAsync(default), Times.Once);
+			var createdUser = await _dbContext.Users.FindAsync(3);
+			createdUser.Should().NotBeNull();
+			createdUser.Username.Should().Be("Charlie");
+			createdUser.FirstName.Should().Be("Charlie");
+			createdUser.LastName.Should().Be("Chaplin");
+			createdUser.Email.Should().Be("charlie@strudelshop.com");
+			createdUser.PhoneNumber.Should().Be("7778889999");
+			createdUser.Address.Should().Be("789 Cherry Blvd");
+			createdUser.Role.Should().Be("User");
 		}
 
 		/// <summary>
@@ -120,14 +154,17 @@ namespace UnitTests.Services
 		public async Task UpdateUserAsync_UpdatesUserAndCallsSaveChanges()
 		{
 			// Arrange
-			var existingUser = new User { UserID = 10, Username = "OldName" };
+			var existingUser = await _dbContext.Users.FindAsync(1);
+			existingUser.FirstName = "Alicia";
+			existingUser.LastName = "Wonder";
 
 			// Act
 			await _userService.UpdateUserAsync(existingUser);
 
 			// Assert
-			_dbContextMock.Verify(db => db.Users.Update(existingUser), Times.Once);
-			_dbContextMock.Verify(db => db.SaveChangesAsync(default), Times.Once);
+			var updatedUser = await _dbContext.Users.FindAsync(1);
+			updatedUser.FirstName.Should().Be("Alicia");
+			updatedUser.LastName.Should().Be("Wonder");
 		}
 
 		/// <summary>
@@ -137,15 +174,15 @@ namespace UnitTests.Services
 		public async Task DeleteUserAsync_WhenUserExists_DeletesUser()
 		{
 			// Arrange
-			var user = new User { UserID = 5, Username = "DeleteMe" };
-			_dbContextMock.Setup(db => db.Users.FindAsync(5)).ReturnsAsync(user);
+			var userId = 2;
+			var existingUser = await _dbContext.Users.FindAsync(userId);
 
 			// Act
-			await _userService.DeleteUserAsync(5);
+			await _userService.DeleteUserAsync(userId);
 
 			// Assert
-			_dbContextMock.Verify(db => db.Users.Remove(user), Times.Once);
-			_dbContextMock.Verify(db => db.SaveChangesAsync(default), Times.Once);
+			var deletedUser = await _dbContext.Users.FindAsync(userId);
+			deletedUser.Should().BeNull();
 		}
 
 		/// <summary>
@@ -155,14 +192,20 @@ namespace UnitTests.Services
 		public async Task DeleteUserAsync_WhenUserDoesNotExist_DoesNothing()
 		{
 			// Arrange
-			_dbContextMock.Setup(db => db.Users.FindAsync(999)).ReturnsAsync((User)null);
+			var nonExistentUserId = 999;
 
 			// Act
-			await _userService.DeleteUserAsync(999);
+			await _userService.DeleteUserAsync(nonExistentUserId);
 
 			// Assert
-			_dbContextMock.Verify(db => db.Users.Remove(It.IsAny<User>()), Times.Never);
-			_dbContextMock.Verify(db => db.SaveChangesAsync(default), Times.Never);
+			var user = await _dbContext.Users.FindAsync(nonExistentUserId);
+			user.Should().BeNull();
+			_dbContext.Users.Count().Should().Be(2); // Ensure no users were removed
+		}
+
+		public void Dispose()
+		{
+			_dbContext.Dispose();
 		}
 	}
 }

@@ -4,10 +4,11 @@ using Xunit;
 using FluentAssertions;
 using Moq;
 using Microsoft.AspNetCore.Mvc;
-using StrudelShop.DataAccess.Services.Interfaces;
-using DataAccess.Models;
 using DataAccess.DTOs;
+using DataAccess.Models;
+using DataAccess.Services.Interfaces;
 using WebAPI.Controllers;
+using StrudelShop.DataAccess.Services.Interfaces;
 
 namespace UnitTests.Controllers
 {
@@ -36,7 +37,7 @@ namespace UnitTests.Controllers
 			var result = await _controller.GetAllOrders();
 
 			// Assert
-			var okResult = Assert.IsType<OkObjectResult>(result);
+			var okResult = Assert.IsType<OkObjectResult>(result.Result);
 			var returnedOrders = Assert.IsType<List<Order>>(okResult.Value);
 			returnedOrders.Should().HaveCount(2);
 		}
@@ -55,7 +56,7 @@ namespace UnitTests.Controllers
 			var result = await _controller.GetOrderById(10);
 
 			// Assert
-			var okResult = Assert.IsType<OkObjectResult>(result);
+			var okResult = Assert.IsType<OkObjectResult>(result.Result);
 			var returnedOrder = Assert.IsType<Order>(okResult.Value);
 			returnedOrder.OrderID.Should().Be(10);
 		}
@@ -73,7 +74,7 @@ namespace UnitTests.Controllers
 			var result = await _controller.GetOrderById(999);
 
 			// Assert
-			Assert.IsType<NotFoundResult>(result);
+			Assert.IsType<NotFoundResult>(result.Result);
 		}
 
 		/// <summary>
@@ -157,14 +158,13 @@ namespace UnitTests.Controllers
 				new OrderHistoryDTO { OrderId = 1 },
 				new OrderHistoryDTO { OrderId = 2 }
 			};
-
 			_orderServiceMock.Setup(s => s.GetOrderHistoryAsync(userId)).ReturnsAsync(history);
 
 			// Act
 			var result = await _controller.GetOrderHistory(userId);
 
 			// Assert
-			var okResult = Assert.IsType<OkObjectResult>(result);
+			var okResult = Assert.IsType<OkObjectResult>(result.Result);
 			var returnedHistory = Assert.IsType<List<OrderHistoryDTO>>(okResult.Value);
 			returnedHistory.Should().HaveCount(2);
 		}
@@ -183,7 +183,7 @@ namespace UnitTests.Controllers
 			var result = await _controller.GetOrderDetails(5);
 
 			// Assert
-			var okResult = Assert.IsType<OkObjectResult>(result);
+			var okResult = Assert.IsType<OkObjectResult>(result.Result);
 			var returnedDetails = Assert.IsType<OrderDetailsDTO>(okResult.Value);
 			returnedDetails.OrderId.Should().Be(5);
 		}
@@ -206,7 +206,7 @@ namespace UnitTests.Controllers
 			var result = await _controller.GetCustomerOrderSummaries();
 
 			// Assert
-			var okResult = Assert.IsType<OkObjectResult>(result);
+			var okResult = Assert.IsType<OkObjectResult>(result.Result);
 			var returnedSummaries = Assert.IsType<List<CustomerOrderSummaryDTO>>(okResult.Value);
 			returnedSummaries.Should().HaveCount(2);
 		}

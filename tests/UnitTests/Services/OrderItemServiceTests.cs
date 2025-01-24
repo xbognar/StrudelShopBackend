@@ -3,7 +3,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using Xunit;
 using FluentAssertions;
-using Moq;
 using Microsoft.EntityFrameworkCore;
 using DataAccess.Services;
 using StrudelShop.DataAccess.DataAccess;
@@ -11,21 +10,29 @@ using DataAccess.Models;
 
 namespace UnitTests.Services
 {
-	public class OrderItemServiceTests
+	public class OrderItemServiceTests : IDisposable
 	{
-		private readonly Mock<ApplicationDbContext> _dbContextMock;
-		private readonly Mock<DbSet<OrderItem>> _orderItemDbSetMock;
+		private readonly ApplicationDbContext _dbContext;
 		private readonly OrderItemService _service;
 
 		public OrderItemServiceTests()
 		{
-			var options = new DbContextOptions<ApplicationDbContext>();
-			_dbContextMock = new Mock<ApplicationDbContext>(options);
+			// Setup In-Memory Database
+			var options = new DbContextOptionsBuilder<ApplicationDbContext>()
+				.UseInMemoryDatabase(databaseName: $"OrderItemTestDb_{System.Guid.NewGuid()}")
+				.Options;
 
-			_orderItemDbSetMock = new Mock<DbSet<OrderItem>>();
-			_dbContextMock.Setup(db => db.OrderItems).Returns(_orderItemDbSetMock.Object);
+			_dbContext = new ApplicationDbContext(options);
 
-			_service = new OrderItemService(_dbContextMock.Object);
+			// Seed initial data
+			_dbContext.OrderItems.AddRange(new List<OrderItem>
+			{
+				new OrderItem { OrderItemID = 1, OrderID = 1000, ProductID = 10, Quantity = 2, Price = 20.00m },
+				new OrderItem { OrderItemID = 2, OrderID = 1001, ProductID = 11, Quantity = 1, Price = 10.00m }
+			});
+			_dbContext.SaveChanges();
+
+			_service = new OrderItemService(_dbContext);
 		}
 
 		/// <summary>
@@ -35,15 +42,18 @@ namespace UnitTests.Services
 		public async Task GetOrderItemByIdAsync_WhenFound_ReturnsItem()
 		{
 			// Arrange
-			var testItem = new OrderItem { OrderItemID = 1 };
-			_dbContextMock.Setup(db => db.OrderItems.FindAsync(1)).ReturnsAsync(testItem);
+			var testItemId = 1;
 
 			// Act
-			var result = await _service.GetOrderItemByIdAsync(1);
+			var result = await _service.GetOrderItemByIdAsync(testItemId);
 
 			// Assert
 			result.Should().NotBeNull();
-			result.OrderItemID.Should().Be(1);
+			result.OrderItemID.Should().Be(testItemId);
+			result.OrderID.Should().Be(1000);
+			result.ProductID.Should().Be(10);
+			result.Quantity.Should().Be(2);
+			result.Price.Should().Be(20.00m);
 		}
 
 		/// <summary>
@@ -53,10 +63,10 @@ namespace UnitTests.Services
 		public async Task GetOrderItemByIdAsync_WhenNotFound_ReturnsNull()
 		{
 			// Arrange
-			_dbContextMock.Setup(db => db.OrderItems.FindAsync(999)).ReturnsAsync((OrderItem)null);
+			var testItemId = 999;
 
 			// Act
-			var result = await _service.GetOrderItemByIdAsync(999);
+			var result = await _service.GetOrderItemByIdAsync(testItemId);
 
 			// Assert
 			result.Should().BeNull();
@@ -68,23 +78,13 @@ namespace UnitTests.Services
 		[Fact]
 		public async Task GetAllOrderItemsAsync_ReturnsAll()
 		{
-			// Arrange
-			var itemsData = new List<OrderItem>
-			{
-				new OrderItem { OrderItemID = 1 },
-				new OrderItem { OrderItemID = 2 }
-			}.AsQueryable();
-
-			_orderItemDbSetMock.As<IQueryable<OrderItem>>().Setup(m => m.Provider).Returns(itemsData.Provider);
-			_orderItemDbSetMock.As<IQueryable<OrderItem>>().Setup(m => m.Expression).Returns(itemsData.Expression);
-			_orderItemDbSetMock.As<IQueryable<OrderItem>>().Setup(m => m.ElementType).Returns(itemsData.ElementType);
-			_orderItemDbSetMock.As<IQueryable<OrderItem>>().Setup(m => m.GetEnumerator()).Returns(itemsData.GetEnumerator());
-
 			// Act
 			var result = await _service.GetAllOrderItemsAsync();
 
 			// Assert
 			result.Should().HaveCount(2);
+			result.Should().Contain(o => o.OrderItemID == 1);
+			result.Should().Contain(o => o.OrderItemID == 2);
 		}
 
 		/// <summary>
@@ -94,31 +94,38 @@ namespace UnitTests.Services
 		public async Task CreateOrderItemAsync_AddsAndSaves()
 		{
 			// Arrange
-			var newItem = new OrderItem { OrderItemID = 10 };
+			var newItem = new OrderItem { OrderItemID = 10, OrderID = 1002, ProductID = 12, Quantity = 3, Price = 30.00m };
 
 			// Act
 			await _service.CreateOrderItemAsync(newItem);
 
 			// Assert
-			_dbContextMock.Verify(db => db.OrderItems.AddAsync(newItem, default), Times.Once);
-			_dbContextMock.Verify(db => db.SaveChangesAsync(default), Times.Once);
+			var createdItem = await _dbContext.OrderItems.FindAsync(10);
+			createdItem.Should().NotBeNull();
+			createdItem.OrderID.Should().Be(1002);
+			createdItem.ProductID.Should().Be(12);
+			createdItem.Quantity.Should().Be(3);
+			createdItem.Price.Should().Be(30.00m);
 		}
 
 		/// <summary>
-		/// Tests that UpdateOrderItemAsync updates the item and calls SaveChanges.
+		/// Tests that UpdateOrderItemAsync updates the item and saves changes.
 		/// </summary>
 		[Fact]
 		public async Task UpdateOrderItemAsync_UpdatesAndSaves()
 		{
 			// Arrange
-			var existingItem = new OrderItem { OrderItemID = 5 };
+			var existingItem = await _dbContext.OrderItems.FindAsync(1);
+			existingItem.Quantity = 5;
+			existingItem.Price = 50.00m;
 
 			// Act
 			await _service.UpdateOrderItemAsync(existingItem);
 
 			// Assert
-			_dbContextMock.Verify(db => db.OrderItems.Update(existingItem), Times.Once);
-			_dbContextMock.Verify(db => db.SaveChangesAsync(default), Times.Once);
+			var updatedItem = await _dbContext.OrderItems.FindAsync(1);
+			updatedItem.Quantity.Should().Be(5);
+			updatedItem.Price.Should().Be(50.00m);
 		}
 
 		/// <summary>
@@ -128,15 +135,14 @@ namespace UnitTests.Services
 		public async Task DeleteOrderItemAsync_WhenFound_DeletesAndSaves()
 		{
 			// Arrange
-			var existingItem = new OrderItem { OrderItemID = 7 };
-			_dbContextMock.Setup(db => db.OrderItems.FindAsync(7)).ReturnsAsync(existingItem);
+			var existingItem = await _dbContext.OrderItems.FindAsync(2);
 
 			// Act
-			await _service.DeleteOrderItemAsync(7);
+			await _service.DeleteOrderItemAsync(2);
 
 			// Assert
-			_dbContextMock.Verify(db => db.OrderItems.Remove(existingItem), Times.Once);
-			_dbContextMock.Verify(db => db.SaveChangesAsync(default), Times.Once);
+			var deletedItem = await _dbContext.OrderItems.FindAsync(2);
+			deletedItem.Should().BeNull();
 		}
 
 		/// <summary>
@@ -146,14 +152,20 @@ namespace UnitTests.Services
 		public async Task DeleteOrderItemAsync_WhenNotFound_DoesNothing()
 		{
 			// Arrange
-			_dbContextMock.Setup(db => db.OrderItems.FindAsync(999)).ReturnsAsync((OrderItem)null);
+			var nonExistentItemId = 999;
 
 			// Act
-			await _service.DeleteOrderItemAsync(999);
+			await _service.DeleteOrderItemAsync(nonExistentItemId);
 
 			// Assert
-			_dbContextMock.Verify(db => db.OrderItems.Remove(It.IsAny<OrderItem>()), Times.Never);
-			_dbContextMock.Verify(db => db.SaveChangesAsync(default), Times.Never);
+			var item = await _dbContext.OrderItems.FindAsync(nonExistentItemId);
+			item.Should().BeNull();
+			_dbContext.OrderItems.Count().Should().Be(2);
+		}
+
+		public void Dispose()
+		{
+			_dbContext.Dispose();
 		}
 	}
 }

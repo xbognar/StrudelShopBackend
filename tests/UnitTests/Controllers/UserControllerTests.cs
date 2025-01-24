@@ -30,8 +30,8 @@ namespace UnitTests.Controllers
 			// Arrange
 			var users = new List<User>
 			{
-				new User { UserID = 1, Username = "Alice" },
-				new User { UserID = 2, Username = "Bob" }
+				new User { UserID = 1, Username = "Alice", Email = "alice@example.com" },
+				new User { UserID = 2, Username = "Bob", Email = "bob@example.com" }
 			};
 			_userServiceMock.Setup(s => s.GetAllUsersAsync()).ReturnsAsync(users);
 
@@ -39,9 +39,11 @@ namespace UnitTests.Controllers
 			var result = await _controller.GetAllUsers();
 
 			// Assert
-			var okResult = Assert.IsType<OkObjectResult>(result);
+			var okResult = Assert.IsType<OkObjectResult>(result.Result);
 			var returnedUsers = Assert.IsType<List<User>>(okResult.Value);
 			returnedUsers.Should().HaveCount(2);
+			returnedUsers.Should().Contain(u => u.UserID == 1 && u.Username == "Alice");
+			returnedUsers.Should().Contain(u => u.UserID == 2 && u.Username == "Bob");
 		}
 
 		/// <summary>
@@ -51,16 +53,18 @@ namespace UnitTests.Controllers
 		public async Task GetUserById_WhenFound_ReturnsOk()
 		{
 			// Arrange
-			var user = new User { UserID = 10, Username = "TestUser" };
+			var user = new User { UserID = 10, Username = "TestUser", Email = "testuser@example.com" };
 			_userServiceMock.Setup(s => s.GetUserByIdAsync(10)).ReturnsAsync(user);
 
 			// Act
 			var result = await _controller.GetUserById(10);
 
 			// Assert
-			var okResult = Assert.IsType<OkObjectResult>(result);
+			var okResult = Assert.IsType<OkObjectResult>(result.Result);
 			var returnedUser = Assert.IsType<User>(okResult.Value);
 			returnedUser.UserID.Should().Be(10);
+			returnedUser.Username.Should().Be("TestUser");
+			returnedUser.Email.Should().Be("testuser@example.com");
 		}
 
 		/// <summary>
@@ -76,7 +80,7 @@ namespace UnitTests.Controllers
 			var result = await _controller.GetUserById(999);
 
 			// Assert
-			Assert.IsType<NotFoundResult>(result);
+			Assert.IsType<NotFoundResult>(result.Result);
 		}
 
 		/// <summary>
@@ -86,7 +90,7 @@ namespace UnitTests.Controllers
 		public async Task CreateUser_ReturnsCreatedAtAction()
 		{
 			// Arrange
-			var newUser = new User { UserID = 3, Username = "NewUser" };
+			var newUser = new User { UserID = 3, Username = "NewUser", Email = "newuser@example.com" };
 			_userServiceMock.Setup(s => s.CreateUserAsync(newUser)).Returns(Task.CompletedTask);
 
 			// Act
@@ -105,7 +109,7 @@ namespace UnitTests.Controllers
 		public async Task UpdateUser_WhenIdMatches_ReturnsNoContent()
 		{
 			// Arrange
-			var user = new User { UserID = 2, Username = "UpdateMe" };
+			var user = new User { UserID = 2, Username = "UpdateMe", Email = "updateme@example.com" };
 			_userServiceMock.Setup(s => s.UpdateUserAsync(user)).Returns(Task.CompletedTask);
 
 			// Act
@@ -122,7 +126,7 @@ namespace UnitTests.Controllers
 		public async Task UpdateUser_WhenIdMismatch_ReturnsBadRequest()
 		{
 			// Arrange
-			var user = new User { UserID = 2 };
+			var user = new User { UserID = 2, Username = "UpdateMe", Email = "updateme@example.com" };
 
 			// Act
 			var result = await _controller.UpdateUser(999, user);

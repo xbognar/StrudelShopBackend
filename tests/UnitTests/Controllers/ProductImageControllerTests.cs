@@ -22,7 +22,7 @@ namespace UnitTests.Controllers
 		}
 
 		/// <summary>
-		/// Tests that GetAllProductImages returns an OkObjectResult with a list of product images.
+		/// Tests that GetAllProductImages returns OkObjectResult with a list of product images.
 		/// </summary>
 		[Fact]
 		public async Task GetAllProductImages_ReturnsOkWithList()
@@ -30,8 +30,8 @@ namespace UnitTests.Controllers
 			// Arrange
 			var images = new List<ProductImage>
 			{
-				new ProductImage { ImageID = 1, ProductID = 10 },
-				new ProductImage { ImageID = 2, ProductID = 20 }
+				new ProductImage { ImageID = 1, ProductID = 10, ImageURL = "image1.jpg" },
+				new ProductImage { ImageID = 2, ProductID = 20, ImageURL = "image2.jpg" }
 			};
 			_productImageServiceMock.Setup(s => s.GetAllProductImagesAsync()).ReturnsAsync(images);
 
@@ -39,7 +39,7 @@ namespace UnitTests.Controllers
 			var result = await _controller.GetAllProductImages();
 
 			// Assert
-			var okResult = Assert.IsType<OkObjectResult>(result);
+			var okResult = Assert.IsType<OkObjectResult>(result.Result);
 			var returnedImages = Assert.IsType<List<ProductImage>>(okResult.Value);
 			returnedImages.Should().HaveCount(2);
 		}
@@ -51,16 +51,18 @@ namespace UnitTests.Controllers
 		public async Task GetProductImageById_WhenFound_ReturnsOk()
 		{
 			// Arrange
-			var image = new ProductImage { ImageID = 5, ProductID = 100 };
+			var image = new ProductImage { ImageID = 5, ProductID = 100, ImageURL = "image5.jpg" };
 			_productImageServiceMock.Setup(s => s.GetProductImageByIdAsync(5)).ReturnsAsync(image);
 
 			// Act
 			var result = await _controller.GetProductImageById(5);
 
 			// Assert
-			var okResult = Assert.IsType<OkObjectResult>(result);
+			var okResult = Assert.IsType<OkObjectResult>(result.Result);
 			var returnedImage = Assert.IsType<ProductImage>(okResult.Value);
 			returnedImage.ImageID.Should().Be(5);
+			returnedImage.ProductID.Should().Be(100);
+			returnedImage.ImageURL.Should().Be("image5.jpg");
 		}
 
 		/// <summary>
@@ -76,7 +78,7 @@ namespace UnitTests.Controllers
 			var result = await _controller.GetProductImageById(999);
 
 			// Assert
-			Assert.IsType<NotFoundResult>(result);
+			Assert.IsType<NotFoundResult>(result.Result);
 		}
 
 		/// <summary>
@@ -86,7 +88,7 @@ namespace UnitTests.Controllers
 		public async Task CreateProductImage_ReturnsCreatedAtAction()
 		{
 			// Arrange
-			var newImage = new ProductImage { ImageID = 7, ProductID = 200 };
+			var newImage = new ProductImage { ImageID = 7, ProductID = 200, ImageURL = "image7.jpg" };
 			_productImageServiceMock.Setup(s => s.CreateProductImageAsync(newImage)).Returns(Task.CompletedTask);
 
 			// Act
@@ -105,7 +107,7 @@ namespace UnitTests.Controllers
 		public async Task UpdateProductImage_WhenIdMatches_ReturnsNoContent()
 		{
 			// Arrange
-			var existingImage = new ProductImage { ImageID = 10, ProductID = 300 };
+			var existingImage = new ProductImage { ImageID = 10, ProductID = 300, ImageURL = "updated_image10.jpg" };
 			_productImageServiceMock.Setup(s => s.UpdateProductImageAsync(existingImage)).Returns(Task.CompletedTask);
 
 			// Act
@@ -122,7 +124,7 @@ namespace UnitTests.Controllers
 		public async Task UpdateProductImage_WhenIdMismatch_ReturnsBadRequest()
 		{
 			// Arrange
-			var image = new ProductImage { ImageID = 10 };
+			var image = new ProductImage { ImageID = 10, ProductID = 300, ImageURL = "image10.jpg" };
 
 			// Act
 			var result = await _controller.UpdateProductImage(999, image);

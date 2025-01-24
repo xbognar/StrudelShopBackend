@@ -1,49 +1,39 @@
-﻿using Microsoft.AspNetCore.Mvc.Testing;
-using Microsoft.EntityFrameworkCore;
+﻿using GymAPI;
+using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.VisualStudio.TestPlatform.TestHost;
 using StrudelShop.DataAccess.DataAccess;
-using System.Linq;
+using System;
 
 namespace IntegrationTests.Dependencies
 {
+	/// <summary>
+	/// Custom WebApplicationFactory for integration tests.
+	/// </summary>
 	public class IntegrationTestFixture : WebApplicationFactory<Program>
 	{
 		protected override IHost CreateHost(IHostBuilder builder)
 		{
-			builder.ConfigureServices(services =>
-			{
-				// Remove existing DbContext registration
-				var descriptor = services.SingleOrDefault(
-					d => d.ServiceType == typeof(DbContextOptions<ApplicationDbContext>));
-				if (descriptor != null)
-					services.Remove(descriptor);
+			builder.UseEnvironment("IntegrationTest");
 
-				// Register InMemory DB
-				services.AddDbContext<ApplicationDbContext>(options =>
-				{
-					options.UseInMemoryDatabase("IntegrationTestDb");
-				});
+			// Set all environment variables your code expects:
+			Environment.SetEnvironmentVariable("ASPNETCORE_ENVIRONMENT", "IntegrationTest");
+			Environment.SetEnvironmentVariable("ADMIN_USERNAME", "admin");
+			Environment.SetEnvironmentVariable("ADMIN_PASSWORD", "adminPass");
+			Environment.SetEnvironmentVariable("JWT_KEY", "IntegrationTestKeyMustBeAtLeast32Char!!");
+			Environment.SetEnvironmentVariable("JWT_ISSUER", "IntegrationTestIssuer");
+			Environment.SetEnvironmentVariable("JWT_AUDIENCE", "IntegrationTestAudience");
+			Environment.SetEnvironmentVariable("JWT_TOKEN_EXPIRY_MINUTES", "60");
+			Environment.SetEnvironmentVariable("CONNECTION_STRING", "FakeIntegrationConnString");
 
-				// Build the service provider
-				var sp = services.BuildServiceProvider();
+			// Let the base create the host with in-memory DB
+			var host = base.CreateHost(builder);
 
-				// Create a scope and seed the DB
-				using (var scope = sp.CreateScope())
-				{
-					var scopedServices = scope.ServiceProvider;
-					var db = scopedServices.GetRequiredService<ApplicationDbContext>();
+			using var scope = host.Services.CreateScope();
+			var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+			SeedDataHelper.Seed(db);
 
-					// Ensure the database is created
-					db.Database.EnsureCreated();
-
-					// Seed test data
-					SeedDataHelper.Seed(db);
-				}
-			});
-
-			return base.CreateHost(builder);
+			return host;
 		}
 	}
 }

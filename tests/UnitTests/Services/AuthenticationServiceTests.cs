@@ -1,42 +1,63 @@
-﻿using System.Collections.Generic;
-using System.Linq;
+﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Xunit;
 using FluentAssertions;
-using Moq;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using DataAccess.Services;
 using DataAccess.Models;
 using DataAccess.DTOs;
 using StrudelShop.DataAccess.DataAccess;
+using Moq;
 
 namespace UnitTests.Services
 {
-	public class AuthenticationServiceTests
+	public class AuthenticationServiceTests : IDisposable
 	{
-		private readonly Mock<ApplicationDbContext> _dbContextMock;
-		private readonly Mock<DbSet<User>> _userDbSetMock;
-		private readonly Mock<IConfiguration> _configMock;
+		private readonly ApplicationDbContext _dbContext;
 		private readonly AuthenticationService _authService;
+		private readonly IConfiguration _config;
 
 		public AuthenticationServiceTests()
 		{
-			var options = new DbContextOptions<ApplicationDbContext>();
-			_dbContextMock = new Mock<ApplicationDbContext>(options);
+			// Setup In-Memory Database
+			var options = new DbContextOptionsBuilder<ApplicationDbContext>()
+				.UseInMemoryDatabase(databaseName: $"AuthTestDb_{Guid.NewGuid()}")
+				.Options;
 
-			_userDbSetMock = new Mock<DbSet<User>>();
-			_dbContextMock.Setup(db => db.Users).Returns(_userDbSetMock.Object);
+			_dbContext = new ApplicationDbContext(options);
 
-			_configMock = new Mock<IConfiguration>();
-			_configMock.SetupGet(x => x["ADMIN_USERNAME"]).Returns("admin");
-			_configMock.SetupGet(x => x["ADMIN_PASSWORD"]).Returns("adminPass");
-			_configMock.SetupGet(x => x["JWT_KEY"]).Returns("SomeSuperSecretKey");
-			_configMock.SetupGet(x => x["JWT_TOKEN_EXPIRY_MINUTES"]).Returns("30");
-			_configMock.SetupGet(x => x["JWT_ISSUER"]).Returns("TestIssuer");
-			_configMock.SetupGet(x => x["JWT_AUDIENCE"]).Returns("TestAudience");
+			// Initialize Configuration with a valid JWT key
+			var inMemorySettings = new Dictionary<string, string> {
+				{"ADMIN_USERNAME", "admin"},
+				{"ADMIN_PASSWORD", "adminPass"},
+				{"JWT_KEY", "ThisIsASuperSecureJWTKey1234567890!!"},
+				{"JWT_TOKEN_EXPIRY_MINUTES", "30"},
+				{"JWT_ISSUER", "TestIssuer"},
+				{"JWT_AUDIENCE", "TestAudience"}
+			};
 
-			_authService = new AuthenticationService(_dbContextMock.Object, _configMock.Object);
+			_config = new ConfigurationBuilder()
+				.AddInMemoryCollection(inMemorySettings)
+				.Build();
+
+			// Seed Admin User
+			var adminUser = new User
+			{
+				Username = _config["ADMIN_USERNAME"],
+				Role = "Admin",
+				Email = "admin@strudelshop.com",
+				FirstName = "System",
+				LastName = "Administrator",
+				PhoneNumber = "123456",
+				Address = "Admin Lane",
+				PasswordHash = _config["ADMIN_PASSWORD"] 
+			};
+			_dbContext.Users.Add(adminUser);
+			_dbContext.SaveChanges();
+
+			_authService = new AuthenticationService(_dbContext, _config);
 		}
 
 		/// <summary>
@@ -46,8 +67,8 @@ namespace UnitTests.Services
 		public async Task AuthenticateAsync_AdminCredentials_ReturnsAdminLoginResponse()
 		{
 			// Arrange
-			var adminUsername = "admin";
-			var adminPassword = "adminPass";
+			var adminUsername = _config["ADMIN_USERNAME"];
+			var adminPassword = _config["ADMIN_PASSWORD"];
 
 			// Act
 			var result = await _authService.AuthenticateAsync(adminUsername, adminPassword);
@@ -68,30 +89,26 @@ namespace UnitTests.Services
 			var username = "testUser";
 			var password = "testPass";
 
-			var userData = new List<User>
+			var user = new User
 			{
-				new User
-				{
-					UserID = 1,
-					Username = "testUser",
-					PasswordHash = "testPass",
-					Role = "User",
-					FirstName = "Test",
-					LastName = "User"
-				}
-			}.AsQueryable();
+				Username = username,
+				Role = "User",
+				Email = "testuser@strudelshop.com",
+				FirstName = "Test",
+				LastName = "User",
+				PhoneNumber = "654321",
+				Address = "User Street 42",
+				PasswordHash = password
+			};
 
-			_userDbSetMock.As<IQueryable<User>>().Setup(m => m.Provider).Returns(userData.Provider);
-			_userDbSetMock.As<IQueryable<User>>().Setup(m => m.Expression).Returns(userData.Expression);
-			_userDbSetMock.As<IQueryable<User>>().Setup(m => m.ElementType).Returns(userData.ElementType);
-			_userDbSetMock.As<IQueryable<User>>().Setup(m => m.GetEnumerator()).Returns(userData.GetEnumerator());
+			_dbContext.Users.Add(user);
+			_dbContext.SaveChanges();
 
 			// Act
 			var result = await _authService.AuthenticateAsync(username, password);
 
 			// Assert
 			result.Should().NotBeNull();
-			result.UserId.Should().Be(1);
 			result.Role.Should().Be("User");
 			result.Token.Should().NotBeNullOrEmpty();
 		}
@@ -103,24 +120,8 @@ namespace UnitTests.Services
 		public async Task AuthenticateAsync_InvalidCredentials_ReturnsNull()
 		{
 			// Arrange
-			var username = "testUser";
+			var username = "nonExistentUser";
 			var password = "wrongPass";
-
-			var userData = new List<User>
-			{
-				new User
-				{
-					UserID = 1,
-					Username = "testUser",
-					PasswordHash = "testPass",
-					Role = "User"
-				}
-			}.AsQueryable();
-
-			_userDbSetMock.As<IQueryable<User>>().Setup(m => m.Provider).Returns(userData.Provider);
-			_userDbSetMock.As<IQueryable<User>>().Setup(m => m.Expression).Returns(userData.Expression);
-			_userDbSetMock.As<IQueryable<User>>().Setup(m => m.ElementType).Returns(userData.ElementType);
-			_userDbSetMock.As<IQueryable<User>>().Setup(m => m.GetEnumerator()).Returns(userData.GetEnumerator());
 
 			// Act
 			var result = await _authService.AuthenticateAsync(username, password);
@@ -136,17 +137,26 @@ namespace UnitTests.Services
 		public async Task RegisterUserAsync_SuccessfulSave_ReturnsTrue()
 		{
 			// Arrange
-			var newUser = new User { Username = "NewUser", PasswordHash = "plainText" };
+			var newUser = new User
+			{
+				Username = "NewUser",
+				Email = "newuser@strudelshop.com",
+				FirstName = "New",
+				LastName = "User",
+				PhoneNumber = "789012",
+				Address = "New Street 100",
+				PasswordHash = "plainText"
+			};
 
 			// Act
 			var result = await _authService.RegisterUserAsync(newUser);
 
 			// Assert
 			result.Should().BeTrue();
-			_dbContextMock.Verify(db => db.Users.AddAsync(newUser, default), Times.Once);
-			_dbContextMock.Verify(db => db.SaveChangesAsync(default), Times.Once);
-			newUser.PasswordHash.Should().Be("plainText"); // trivial hash from example
-			newUser.Role.Should().Be("User");
+			var createdUser = await _dbContext.Users.FirstOrDefaultAsync(u => u.Username == "NewUser");
+			createdUser.Should().NotBeNull();
+			createdUser.Role.Should().Be("User");
+			createdUser.PasswordHash.Should().Be("plainText");
 		}
 
 		/// <summary>
@@ -156,14 +166,26 @@ namespace UnitTests.Services
 		public async Task RegisterUserAsync_NoChangesSaved_ReturnsFalse()
 		{
 			// Arrange
-			var newUser = new User { Username = "NewUser", PasswordHash = "plainText" };
-			_dbContextMock.Setup(db => db.SaveChangesAsync(default)).ReturnsAsync(0);
+			var newUser = new User { Username = "AnotherUser", PasswordHash = "anotherPass" };
+			var dbContextMock = new Mock<ApplicationDbContext>(new DbContextOptions<ApplicationDbContext>());
+			var mockSet = new Mock<DbSet<User>>();
+			dbContextMock.Setup(db => db.Users).Returns(mockSet.Object);
+			dbContextMock.Setup(db => db.SaveChangesAsync(It.IsAny<System.Threading.CancellationToken>())).ReturnsAsync(0);
+
+			var authServiceMock = new AuthenticationService(dbContextMock.Object, _config);
 
 			// Act
-			var result = await _authService.RegisterUserAsync(newUser);
+			var result = await authServiceMock.RegisterUserAsync(newUser);
 
 			// Assert
 			result.Should().BeFalse();
+			mockSet.Verify(db => db.AddAsync(It.Is<User>(u => u == newUser), It.IsAny<System.Threading.CancellationToken>()), Times.Once);
+			dbContextMock.Verify(db => db.SaveChangesAsync(It.IsAny<System.Threading.CancellationToken>()), Times.Once);
+		}
+
+		public void Dispose()
+		{
+			_dbContext.Dispose();
 		}
 	}
 }

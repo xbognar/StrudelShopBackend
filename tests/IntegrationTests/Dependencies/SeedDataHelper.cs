@@ -1,8 +1,7 @@
-﻿using StrudelShop.DataAccess.DataAccess;
-using DataAccess.Models;
+﻿using DataAccess.Models;
+using StrudelShop.DataAccess.DataAccess;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace IntegrationTests.Dependencies
 {
@@ -10,10 +9,6 @@ namespace IntegrationTests.Dependencies
 	{
 		public static void Seed(ApplicationDbContext db)
 		{
-			// If already seeded, return
-			if (db.Users.Any()) return;
-
-			// 1) Users (Admin + normal user)
 			var adminUser = new User
 			{
 				UserID = 1,
@@ -40,7 +35,6 @@ namespace IntegrationTests.Dependencies
 			};
 			db.Users.AddRange(adminUser, normalUser);
 
-			// 2) Products
 			var appleProd = new Product
 			{
 				ProductID = 10,
@@ -54,75 +48,60 @@ namespace IntegrationTests.Dependencies
 			{
 				ProductID = 11,
 				Name = "Cherry Strudel",
-				Description = "Cherry-filled pastry",
+				Description = "Cherry pastry",
 				Price = 6.99m,
 				ImageURL = "cherry.jpg",
 				ProductImages = new List<ProductImage>()
 			};
 			db.Products.AddRange(appleProd, cherryProd);
 
-			// 3) Product Images
-			db.ProductImages.Add(new ProductImage
+			var appleImage1 = new ProductImage
 			{
 				ImageID = 100,
 				ProductID = 10,
 				ImageURL = "apple_strudel_1.jpg"
-			});
-			db.ProductImages.Add(new ProductImage
+			};
+			var appleImage2 = new ProductImage
 			{
 				ImageID = 101,
-				ProductID = 11,
-				ImageURL = "cherry_strudel_1.jpg"
-			});
+				ProductID = 10,
+				ImageURL = "apple_strudel_2.jpg"
+			};
+			db.ProductImages.AddRange(appleImage1, appleImage2);
 
-			// 4) Orders
 			var order1 = new Order
 			{
 				OrderID = 1000,
-				UserID = normalUser.UserID,
-				OrderDate = DateTime.UtcNow,
-				DeliveryDate = DateTime.UtcNow.AddDays(2),
-				TotalAmount = 12.98m,
-				PaymentStatus = "Paid",
-				OrderItems = new List<OrderItem>()
+				UserID = 2, 
+				TotalAmount = 20.00m,
+				PaymentStatus = "Pending"
 			};
 			var order2 = new Order
 			{
 				OrderID = 1001,
-				UserID = normalUser.UserID,
-				OrderDate = DateTime.UtcNow,
-				DeliveryDate = DateTime.UtcNow.AddDays(3),
-				TotalAmount = 5.99m,
-				PaymentStatus = "Pending",
-				OrderItems = new List<OrderItem>()
+				UserID = 2,
+				TotalAmount = 35.00m,
+				PaymentStatus = "Paid"
 			};
 			db.Orders.AddRange(order1, order2);
 
-			// 5) Order Items
-			db.OrderItems.Add(new OrderItem
+			var orderItem1 = new OrderItem
 			{
 				OrderItemID = 500,
 				OrderID = 1000,
 				ProductID = 10,
 				Quantity = 2,
 				Price = 5.99m
-			});
-			db.OrderItems.Add(new OrderItem
+			};
+			var orderItem2 = new OrderItem
 			{
 				OrderItemID = 501,
 				OrderID = 1000,
 				ProductID = 11,
 				Quantity = 1,
 				Price = 6.99m
-			});
-			db.OrderItems.Add(new OrderItem
-			{
-				OrderItemID = 502,
-				OrderID = 1001,
-				ProductID = 10,
-				Quantity = 1,
-				Price = 5.99m
-			});
+			};
+			db.OrderItems.AddRange(orderItem1, orderItem2);
 
 			db.SaveChanges();
 		}
