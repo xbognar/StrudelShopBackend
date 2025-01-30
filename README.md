@@ -205,7 +205,7 @@ The StrudelShop Backend is backed by a thorough **testing strategy** that includ
 1. **Unit Tests**  
    - **Tools & Frameworks**: 
      - [xUnit](https://xunit.net/) – Test framework  
-     - [Moq](https://github.com/moq/moq4) – Mocking library  
+     - [EF Core InMemory](https://learn.microsoft.com/en-us/ef/core/providers/in-memory) – Replaces the SQL Server with an in-memory DB for testing  
      - [FluentAssertions](https://fluentassertions.com/) – Expressive, readable assertions  
 
    - **Scope**:
@@ -220,7 +220,8 @@ The StrudelShop Backend is backed by a thorough **testing strategy** that includ
 2. **Integration Tests**  
    - **Tools & Frameworks**:
      - [Microsoft.AspNetCore.Mvc.Testing](https://learn.microsoft.com/en-us/dotnet/core/testing/integration-testing) – Spins up an **in-memory** ASP.NET Core test server  
-     - [EF Core InMemory](https://learn.microsoft.com/en-us/ef/core/providers/in-memory) – Replaces the SQL Server with an in-memory DB for testing  
+     - [EF Core InMemory](https://learn.microsoft.com/en-us/ef/core/providers/in-memory) – Replaces the SQL Server with an in-memory DB for testing
+     - [FluentAssertions](https://fluentassertions.com/) – Expressive, readable assertions  
 
    - **Scope**:
      - Tests full end-to-end, from the **HTTP request** through **controllers**, **services**, **entity framework layer**, and into an **in-memory** database.
