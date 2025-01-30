@@ -29,21 +29,14 @@ namespace IntegrationTests.Controllers
 		public async Task Register_ValidUser_ReturnsOk()
 		{
 			// ARRANGE
-			var newUser = new User
+			var registerDto = new RegisterRequestDTO
 			{
 				Username = "newTestUser",
-				PasswordHash = "testPass123",
-				Email = "newuser@mail.com",
-				FirstName = "New",
-				LastName = "User",
-				PhoneNumber = "1112223333",
-				Address = "123 Test Street",
-				Role = "User",
-				Orders = new List<Order>()
+				Password = "testPass123"
 			};
 
 			// ACT
-			var response = await _client.PostAsJsonAsync("/api/authentication/register", newUser);
+			var response = await _client.PostAsJsonAsync("/api/authentication/register", registerDto);
 
 			// ASSERT
 			if (response.StatusCode != HttpStatusCode.OK)

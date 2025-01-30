@@ -28,13 +28,20 @@ namespace UnitTests.Controllers
 		public async Task Register_WhenRegistrationSucceeds_ReturnsOk()
 		{
 			// Arrange
-			var newUser = new User { Username = "testUser" };
+			var registerDto = new RegisterRequestDTO
+			{
+				Username = "testUser",
+				Password = "testPass"
+			};
+
+			// We don't care about the exact User object inside the controller,
+			// just that RegisterUserAsync returns true
 			_authServiceMock
-				.Setup(s => s.RegisterUserAsync(newUser))
+				.Setup(s => s.RegisterUserAsync(It.IsAny<User>()))
 				.ReturnsAsync(true);
 
 			// Act
-			var result = await _controller.Register(newUser);
+			var result = await _controller.Register(registerDto);
 
 			// Assert
 			var actionResult = Assert.IsType<OkObjectResult>(result);
@@ -48,13 +55,18 @@ namespace UnitTests.Controllers
 		public async Task Register_WhenRegistrationFails_ReturnsBadRequest()
 		{
 			// Arrange
-			var newUser = new User { Username = "testUser" };
+			var registerDto = new RegisterRequestDTO
+			{
+				Username = "testUser",
+				Password = "testPass"
+			};
+
 			_authServiceMock
-				.Setup(s => s.RegisterUserAsync(newUser))
+				.Setup(s => s.RegisterUserAsync(It.IsAny<User>()))
 				.ReturnsAsync(false);
 
 			// Act
-			var result = await _controller.Register(newUser);
+			var result = await _controller.Register(registerDto);
 
 			// Assert
 			var actionResult = Assert.IsType<BadRequestObjectResult>(result);

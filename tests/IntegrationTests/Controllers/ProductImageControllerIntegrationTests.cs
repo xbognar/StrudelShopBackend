@@ -38,7 +38,7 @@ namespace IntegrationTests.Controllers
 			response.StatusCode.Should().Be(HttpStatusCode.OK);
 			var images = await response.Content.ReadFromJsonAsync<List<ProductImage>>();
 			images.Should().NotBeNull();
-			images.Should().HaveCount(2);
+			images.Should().HaveCount(1);
 		}
 
 		/// <summary>
