@@ -20,11 +20,18 @@ namespace WebAPI.Controllers
 
 		[AllowAnonymous]
 		[HttpPost("register")]
-		public async Task<ActionResult> Register([FromBody] User newUser)
+		public async Task<ActionResult> Register([FromBody] RegisterRequestDTO registerDto)
 		{
+			var newUser = new User
+			{
+				Username = registerDto.Username,
+				PasswordHash = registerDto.Password
+			};
+
 			var isRegistered = await _authService.RegisterUserAsync(newUser);
 			if (!isRegistered)
 				return BadRequest("Registration failed.");
+
 			return Ok("Registration successful");
 		}
 
@@ -32,9 +39,14 @@ namespace WebAPI.Controllers
 		[HttpPost("login")]
 		public async Task<ActionResult<LoginResponseDTO>> Login([FromBody] LoginRequestDTO loginRequest)
 		{
-			var response = await _authService.AuthenticateAsync(loginRequest.Username, loginRequest.Password);
+			var response = await _authService.AuthenticateAsync(
+				loginRequest.Username,
+				loginRequest.Password
+			);
+
 			if (response == null)
 				return Unauthorized("Invalid credentials");
+
 			return Ok(response);
 		}
 	}
