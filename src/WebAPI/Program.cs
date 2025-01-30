@@ -89,7 +89,7 @@ namespace GymAPI
 
 			var app = builder.Build();
 
-			// If not IntegrationTest, do your “wait for SQL + migrate”
+			// If not IntegrationTest, then wait for SQL + migrate
 			if (!app.Environment.IsEnvironment("IntegrationTest"))
 			{
 				using var scope = app.Services.CreateScope();
